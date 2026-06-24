@@ -63,6 +63,7 @@ async function ensureAdkSession(userId, sessionId) {
 /**
  * Helper: Run the orchestrator agent and collect the final response.
  * Returns { reply, agent } where agent is the name of the responding agent.
+ * After response, updates sessionManager state based on which agent responded.
  */
 async function runAgent(userId, sessionId, messageText) {
     await ensureAdkSession(userId, sessionId);
@@ -103,10 +104,184 @@ async function runAgent(userId, sessionId, messageText) {
     // The author field tells us which agent produced the final response
     const agent = lastEvent.author || "orchestrator_agent";
 
+    // Task 7.2: Update session state based on which agent responded
+    updateSessionFromResponse(sessionId, agent, reply);
+
     return {
         reply,
         agent
     };
+}
+
+/**
+ * Task 7.2: Parse agent response and update session state accordingly.
+ * Each agent type contributes different data to the shared context.
+ */
+function updateSessionFromResponse(sessionId, agent, reply) {
+    try {
+        if (agent === "resume_agent") {
+            // Extract skills from response (look for skills lists)
+            const skills = extractSkills(reply);
+            const score = extractScore(reply);
+            const experience = extractExperience(reply);
+
+            const updates = {};
+            if (skills.length > 0) updates.skills = skills;
+            if (score !== null) updates.resumeScore = score;
+            if (experience) updates.experience = experience;
+
+            if (Object.keys(updates).length > 0) {
+                sessionManager.updateState(sessionId, updates);
+                console.log("[Context] Resume Agent updated state:", Object.keys(updates));
+            }
+        } else if (agent === "career_agent") {
+            // Extract career goals and recommended skills
+            const careerGoals = extractCareerGoals(reply);
+            const recommendedSkills = extractRecommendedSkills(reply);
+            const targetRoles = extractTargetRoles(reply);
+
+            const updates = {};
+            if (careerGoals.length > 0) updates.careerGoals = careerGoals;
+            if (recommendedSkills.length > 0) updates.recommendedSkills = recommendedSkills;
+            if (targetRoles.length > 0) updates.targetRoles = targetRoles;
+
+            if (Object.keys(updates).length > 0) {
+                sessionManager.updateState(sessionId, updates);
+                console.log("[Context] Career Agent updated state:", Object.keys(updates));
+            }
+        } else if (agent === "interview_agent") {
+            // Append to interview history
+            const state = sessionManager.getState(sessionId);
+            const historyEntry = {
+                timestamp: Date.now(),
+                responsePreview: reply.substring(0, 200),
+            };
+            const updatedHistory = [].concat(state.interviewHistory || [], [historyEntry]);
+            sessionManager.updateState(sessionId, {
+                interviewHistory: updatedHistory
+            });
+            console.log("[Context] Interview Agent appended to history");
+        }
+    } catch (err) {
+        // Non-critical: don't break the response if parsing fails
+        console.warn("[Context] Failed to update state from response:", err.message);
+    }
+}
+
+/**
+ * Extract technical skills from agent response text.
+ */
+function extractSkills(text) {
+    const skills = [];
+    // Look for common skill-list patterns in markdown
+    const skillSection = text.match(/(?:skills?\s*(?:found|inventory|identified|extracted))[\s\S]*?(?=\n#|\n##|$)/i);
+    if (skillSection) {
+        // Extract bullet points
+        const bullets = skillSection[0].match(/[-*]\s+(.+)/g);
+        if (bullets) {
+            bullets.forEach((b) => {
+                const skill = b.replace(/^[-*]\s+/, "").replace(/\*\*/g, "").trim();
+                if (skill.length > 0 && skill.length < 50) {
+                    skills.push(skill);
+                }
+            });
+        }
+    }
+    return skills.slice(0, 20); // Cap at 20 skills
+}
+
+/**
+ * Extract resume score from agent response.
+ */
+function extractScore(text) {
+    const scoreMatch = text.match(/(?:score|rating)[:\s]*(\d{1,3})\s*(?:\/\s*100|out of 100)/i);
+    if (scoreMatch) {
+        const num = parseInt(scoreMatch[1], 10);
+        if (num >= 0 && num <= 100) return num;
+    }
+    // Try alternative pattern: "78/100"
+    const altMatch = text.match(/(\d{1,3})\s*\/\s*100/);
+    if (altMatch) {
+        const num = parseInt(altMatch[1], 10);
+        if (num >= 0 && num <= 100) return num;
+    }
+    return null;
+}
+
+/**
+ * Extract experience level from agent response.
+ */
+function extractExperience(text) {
+    const expMatch = text.match(/(?:experience|level)[:\s]*(.{3,40}?)(?:\n|$)/i);
+    if (expMatch) {
+        return expMatch[1].replace(/\*\*/g, "").trim();
+    }
+    return null;
+}
+
+/**
+ * Extract career goals/paths from career agent response.
+ */
+function extractCareerGoals(text) {
+    const goals = [];
+    const section = text.match(/(?:career\s*paths?|recommended\s*paths?)[\s\S]*?(?=\n##|\n#[^#]|$)/i);
+    if (section) {
+        const items = section[0].match(/\d+\.\s+\*\*(.+?)\*\*/g);
+        if (items) {
+            items.forEach((item) => {
+                const match = item.match(/\*\*(.+?)\*\*/);
+                if (match) goals.push(match[1].trim());
+            });
+        }
+        if (goals.length === 0) {
+            const bullets = section[0].match(/[-*]\s+\*\*(.+?)\*\*/g);
+            if (bullets) {
+                bullets.forEach((b) => {
+                    const match = b.match(/\*\*(.+?)\*\*/);
+                    if (match) goals.push(match[1].trim());
+                });
+            }
+        }
+    }
+    return goals.slice(0, 5);
+}
+
+/**
+ * Extract recommended skills from career agent response.
+ */
+function extractRecommendedSkills(text) {
+    const skills = [];
+    const section = text.match(/(?:recommended\s*skills?|missing\s*skills?|skills?\s*to\s*learn)[\s\S]*?(?=\n##|\n#[^#]|$)/i);
+    if (section) {
+        const bullets = section[0].match(/[-*]\s+(.+)/g);
+        if (bullets) {
+            bullets.forEach((b) => {
+                const skill = b.replace(/^[-*]\s+/, "").replace(/\*\*/g, "").split(/[-–:]/)[0].trim();
+                if (skill.length > 0 && skill.length < 50) {
+                    skills.push(skill);
+                }
+            });
+        }
+    }
+    return skills.slice(0, 10);
+}
+
+/**
+ * Extract target roles from career agent response.
+ */
+function extractTargetRoles(text) {
+    const roles = [];
+    const section = text.match(/(?:target\s*roles?|job\s*roles?|positions?)[\s\S]*?(?=\n##|\n#[^#]|$)/i);
+    if (section) {
+        const bullets = section[0].match(/[-*]\s+\*\*(.+?)\*\*/g);
+        if (bullets) {
+            bullets.forEach((b) => {
+                const match = b.match(/\*\*(.+?)\*\*/);
+                if (match) roles.push(match[1].trim());
+            });
+        }
+    }
+    return roles.slice(0, 5);
 }
 
 // ============================================================
@@ -320,16 +495,22 @@ app.post("/career-plan", async (req, res) => {
 });
 
 // ============================================================
-// Helper: Build context block from session state
+// Helper: Build context block from session state (Task 7.1)
+// Provides accumulated knowledge to agents for cross-agent awareness
 // ============================================================
 function buildContextBlock(state) {
-    const parts = ["[Session Context]"];
+    const parts = ["[Session Context - Shared between agents]"];
 
+    if (state.resumeText) {
+        // Include a truncated resume summary so career/interview agents have it
+        const resumePreview = state.resumeText.substring(0, 500);
+        parts.push("Resume Summary: " + resumePreview + (state.resumeText.length > 500 ? "..." : ""));
+    }
     if (state.skills && state.skills.length > 0) {
-        parts.push("Skills: " + state.skills.join(", "));
+        parts.push("Identified Skills: " + state.skills.join(", "));
     }
     if (state.experience) {
-        parts.push("Experience: " + state.experience);
+        parts.push("Experience Level: " + state.experience);
     }
     if (state.resumeScore) {
         parts.push("Resume Score: " + state.resumeScore + "/100");
@@ -337,8 +518,14 @@ function buildContextBlock(state) {
     if (state.careerGoals && state.careerGoals.length > 0) {
         parts.push("Career Goals: " + state.careerGoals.join(", "));
     }
+    if (state.recommendedSkills && state.recommendedSkills.length > 0) {
+        parts.push("Recommended Skills to Learn: " + state.recommendedSkills.join(", "));
+    }
     if (state.targetRoles && state.targetRoles.length > 0) {
         parts.push("Target Roles: " + state.targetRoles.join(", "));
+    }
+    if (state.interviewHistory && state.interviewHistory.length > 0) {
+        parts.push("Interview Sessions Completed: " + state.interviewHistory.length);
     }
 
     return parts.join("\n");
