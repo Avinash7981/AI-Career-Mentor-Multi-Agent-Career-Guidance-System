@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
 import {
@@ -15,51 +15,39 @@ import {
 import ChatMessage from "./components/ChatMessage";
 
 function App() {
-  const [chats, setChats] = useState([]);
-  const [currentChatId, setCurrentChatId] = useState(null);
+  const [chats, setChats] = useState(() => {
+    const saved = JSON.parse(localStorage.getItem("careerChats") || "null");
+    if (saved && saved.length > 0) return saved;
+    const firstChat = {
+      id: Date.now(),
+      title: "New Chat",
+      messages: [
+        {
+          type: "bot",
+          text: "Hi 👋 I'm your AI Career Mentor. Upload your resume, ask about career paths, or practice interviews!",
+          agent: "orchestrator_agent",
+        },
+      ],
+    };
+    localStorage.setItem("careerChats", JSON.stringify([firstChat]));
+    return [firstChat];
+  });
+  const [currentChatId, setCurrentChatId] = useState(() => {
+    const saved = JSON.parse(localStorage.getItem("careerChats") || "null");
+    return saved && saved.length > 0 ? saved[0].id : null;
+  });
   const [input, setInput] = useState("");
   const [showUploadMenu, setShowUploadMenu] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [sessionId, setSessionId] = useState(null);
-
-  useEffect(() => {
-    // Load or create sessionId for backend agent context
-    let storedSessionId = localStorage.getItem("sessionId");
-    if (!storedSessionId) {
-      storedSessionId = crypto.randomUUID();
-      localStorage.setItem("sessionId", storedSessionId);
+  const [sessionId, setSessionId] = useState(() => {
+    let stored = localStorage.getItem("sessionId");
+    if (!stored) {
+      stored = crypto.randomUUID();
+      localStorage.setItem("sessionId", stored);
     }
-    setSessionId(storedSessionId);
-
-    const savedChats =
-      JSON.parse(localStorage.getItem("careerChats")) || [];
-
-    if (savedChats.length > 0) {
-      setChats(savedChats);
-      setCurrentChatId(savedChats[0].id);
-    } else {
-      const firstChat = {
-        id: Date.now(),
-        title: "New Chat",
-        messages: [
-          {
-            type: "bot",
-            text: "Hi 👋 I'm your AI Career Mentor. Upload your resume, ask about career paths, or practice interviews!",
-            agent: "orchestrator_agent",
-          },
-        ],
-      };
-
-      setChats([firstChat]);
-      setCurrentChatId(firstChat.id);
-
-      localStorage.setItem(
-        "careerChats",
-        JSON.stringify([firstChat])
-      );
-    }
-  }, []);
+    return stored;
+  });
 
   const saveChats = (updatedChats) => {
     setChats(updatedChats);
