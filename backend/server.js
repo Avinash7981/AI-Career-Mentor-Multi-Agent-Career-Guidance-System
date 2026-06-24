@@ -75,8 +75,9 @@ async function runAgent(userId, sessionId, messageText) {
         }],
     };
 
-    let lastEvent = null;
+    let lastTextEvent = null;
     let routedAgent = "orchestrator_agent";
+    let functionResponseText = null;
 
     for await (const event of runner.runAsync({
         userId,
@@ -85,48 +86,82 @@ async function runAgent(userId, sessionId, messageText) {
     })) {
         // Log every event to track routing
         if (event.author && event.author !== "user") {
-            console.log(`[EVENT] author=${event.author}, hasParts=${!!(event.content && event.content.parts && event.content.parts.length > 0)}, isFunctionCall=${!!(event.content && event.content.parts && event.content.parts.some(p => p.functionCall))}, isFunctionResponse=${!!(event.content && event.content.parts && event.content.parts.some(p => p.functionResponse))}`);
+            const partTypes = (event.content && event.content.parts) ?
+                event.content.parts.map(p => {
+                    if (p.functionCall) return `functionCall:${p.functionCall.name}`;
+                    if (p.functionResponse) return `functionResponse:${p.functionResponse.name}`;
+                    if (p.text) return `text(${p.text.substring(0, 50)}...)`;
+                    if (p.thought) return "thought";
+                    return "unknown";
+                }).join(", ") :
+                "no-parts";
+            console.log(`[EVENT] author=${event.author} | parts=[${partTypes}]`);
         }
 
-        // Detect when orchestrator makes a function call to a specialist
+        // Process parts
         if (event.content && event.content.parts) {
             for (const part of event.content.parts) {
                 if (part.functionCall) {
-                    console.log(`[ROUTING] -> ${part.functionCall.name} (request: ${JSON.stringify(part.functionCall.args).substring(0, 100)}...)`);
+                    console.log(`[ROUTING] -> ${part.functionCall.name}`);
                     routedAgent = part.functionCall.name;
                 }
                 if (part.functionResponse) {
                     console.log(`[ROUTING] <- ${part.functionResponse.name} responded`);
+                    // Extract text from functionResponse — this is where specialist output lives
+                    const resp = part.functionResponse.response;
+                    if (resp) {
+                        // Response can be a string or an object with output/text/result
+                        if (typeof resp === "string") {
+                            functionResponseText = resp;
+                        } else if (resp.output) {
+                            functionResponseText = resp.output;
+                        } else if (resp.result) {
+                            functionResponseText = typeof resp.result === "string" ? resp.result : JSON.stringify(resp.result);
+                        } else if (resp.text) {
+                            functionResponseText = resp.text;
+                        } else {
+                            // Try to stringify
+                            functionResponseText = JSON.stringify(resp);
+                        }
+                        console.log(`[ROUTING] <- text extracted (${functionResponseText ? functionResponseText.length : 0} chars)`);
+                    }
                 }
-            }
-        }
-
-        // Collect events; the last non-partial event with text content is the response
-        if (event.content && event.content.parts && event.content.parts.length > 0) {
-            const hasText = event.content.parts.some(p => p.text && !p.thought);
-            if (hasText) {
-                lastEvent = event;
+                // Track text events (orchestrator's final summarization)
+                if (part.text && !part.thought) {
+                    lastTextEvent = event;
+                }
             }
         }
     }
 
-    if (!lastEvent) {
+    // Determine the final reply text
+    let reply = null;
+
+    // Priority 1: If there's a direct text event (orchestrator summarized the response)
+    if (lastTextEvent) {
+        reply = lastTextEvent.content.parts
+            .filter((part) => part.text && !part.thought)
+            .map((part) => part.text)
+            .join("\n");
+    }
+
+    // Priority 2: If no text event but we got a functionResponse, use that
+    if (!reply && functionResponseText) {
+        reply = functionResponseText;
+    }
+
+    // Fallback
+    if (!reply) {
         return {
             reply: "I'm sorry, I couldn't generate a response.",
             agent: "orchestrator_agent"
         };
     }
 
-    // Extract text from the response parts
-    const reply = lastEvent.content.parts
-        .filter((part) => part.text && !part.thought)
-        .map((part) => part.text)
-        .join("\n");
-
     // Use the routed agent name (from function call) or fallback to event author
-    const agent = routedAgent !== "orchestrator_agent" ? routedAgent : (lastEvent.author || "orchestrator_agent");
+    const agent = routedAgent !== "orchestrator_agent" ? routedAgent : "orchestrator_agent";
 
-    console.log(`[RESULT] Final agent: ${agent}`);
+    console.log(`[RESULT] Final agent: ${agent}, reply length: ${reply.length}`);
 
     // Task 7.2: Update session state based on which agent responded
     updateSessionFromResponse(sessionId, agent, reply);
