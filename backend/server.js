@@ -76,15 +76,37 @@ async function runAgent(userId, sessionId, messageText) {
     };
 
     let lastEvent = null;
+    let routedAgent = "orchestrator_agent";
 
     for await (const event of runner.runAsync({
         userId,
         sessionId,
         newMessage,
     })) {
-        // Collect events; the last non-partial event with content is the response
+        // Log every event to track routing
+        if (event.author && event.author !== "user") {
+            console.log(`[EVENT] author=${event.author}, hasParts=${!!(event.content && event.content.parts && event.content.parts.length > 0)}, isFunctionCall=${!!(event.content && event.content.parts && event.content.parts.some(p => p.functionCall))}, isFunctionResponse=${!!(event.content && event.content.parts && event.content.parts.some(p => p.functionResponse))}`);
+        }
+
+        // Detect when orchestrator makes a function call to a specialist
+        if (event.content && event.content.parts) {
+            for (const part of event.content.parts) {
+                if (part.functionCall) {
+                    console.log(`[ROUTING] -> ${part.functionCall.name} (request: ${JSON.stringify(part.functionCall.args).substring(0, 100)}...)`);
+                    routedAgent = part.functionCall.name;
+                }
+                if (part.functionResponse) {
+                    console.log(`[ROUTING] <- ${part.functionResponse.name} responded`);
+                }
+            }
+        }
+
+        // Collect events; the last non-partial event with text content is the response
         if (event.content && event.content.parts && event.content.parts.length > 0) {
-            lastEvent = event;
+            const hasText = event.content.parts.some(p => p.text && !p.thought);
+            if (hasText) {
+                lastEvent = event;
+            }
         }
     }
 
@@ -101,8 +123,10 @@ async function runAgent(userId, sessionId, messageText) {
         .map((part) => part.text)
         .join("\n");
 
-    // The author field tells us which agent produced the final response
-    const agent = lastEvent.author || "orchestrator_agent";
+    // Use the routed agent name (from function call) or fallback to event author
+    const agent = routedAgent !== "orchestrator_agent" ? routedAgent : (lastEvent.author || "orchestrator_agent");
+
+    console.log(`[RESULT] Final agent: ${agent}`);
 
     // Task 7.2: Update session state based on which agent responded
     updateSessionFromResponse(sessionId, agent, reply);
