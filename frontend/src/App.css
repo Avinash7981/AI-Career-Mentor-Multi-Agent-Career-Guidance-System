@@ -362,3 +362,15 @@ body {
     margin-bottom: 10px;
     max-width: fit-content;
 }
+
+
+/* Agent Badge */
+.agent-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    opacity: 0.9;
+}
