@@ -2,47 +2,36 @@
 
 ## Latest Session
 
-**Date:** 2025-06-25 (session 5 - CSS recovery)
+**Date:** 2025-06-25 (session 6 - multi-agent orchestration)
 
 **Work Completed:**
-1. Added all Resume Dashboard CSS to App.css (was interrupted in previous session)
-2. Verified build passes (2692 modules, no errors)
-3. Verified lint passes (0 errors)
-4. No JS/JSX files modified — CSS-only recovery
+1. Updated orchestrator prompt to support multi-agent routing (call 1-3 tools per query)
+2. Updated SSE streaming endpoint to track all participating agents
+3. Added progress events: "Planning...", "Reviewing Resume...", "Generating Career Advice..."
+4. Frontend handles agents[] array and progress events
+5. ChatMessage renders multiple agent badges for multi-agent responses
+6. Loading state shows progress text and agent badges as they're detected
+7. Final message stores agents[] array for multi-agent responses
+8. Resume Dashboard skipped for multi-agent responses (uses markdown instead)
 
 **Files Modified:**
-- frontend/src/App.css (appended Resume Dashboard styles)
-
-**CSS Classes Added:**
-- .resume-dashboard, .rd-section, .rd-section-title
-- .score-circle-container, .score-circle-value, .score-number, .score-total, .score-label
-- .rd-score-section, .rd-categories, .rd-category, .rd-cat-header, .rd-cat-name, .rd-cat-score
-- .rd-progress-track, .rd-progress-fill
-- .rd-chips-grid, .rd-chip, .rd-chip-green, .rd-chip-red
-- .rd-skills, .rd-skill-group, .rd-skill-category, .rd-skill-chips, .rd-skill-chip
-- .rd-improvements, .rd-improvement, .rd-imp-text, .rd-imp-badge, .rd-imp-high/medium/low
-- .priority-high, .priority-med, .priority-low
-- .rd-actions, .rd-action-btn, .rd-action-secondary
-- .rd-raw-section, .rd-raw-toggle, .rd-raw-content
-- @keyframes fadeInUp animation
+- backend/prompts/orchestrator.prompt.js (multi-agent routing instructions)
+- backend/server.js (streaming endpoint: multi-agent tracking, progress events, getAgentProgressLabel)
+- frontend/src/App.jsx (streamingAgents[], streamingProgress state, multi-agent rendering)
+- frontend/src/App.css (multi-agent-badges class)
+- frontend/src/components/ChatMessage.jsx (multi-agent badge display, skip dashboard for multi-agent)
 
 **Current Blockers:**
-- None — build passes, lint clean, all components integrated
+- None — build passes, lint clean, backend syntax valid
 
 **Next Task:**
-- Live test with Gemini API key
+- Live test multi-agent queries with Gemini API
 - Deploy for hackathon
 
 ## Previous Sessions
 
-**Session 4 (markdown rendering):**
-- CodeBlock, MarkdownRenderer components, syntax highlighting
-
-**Session 3 (streaming):**
-- SSE streaming endpoint, progressive text reveal, blinking cursor
-
-**Session 2 (UI overhaul):**
-- Complete frontend redesign
-
-**Session 1 (initial):**
-- Tasks 1-8, bug fixes, project memory
+**Session 5:** CSS recovery for Resume Dashboard
+**Session 4:** Markdown rendering with syntax highlighting
+**Session 3:** SSE streaming
+**Session 2:** UI overhaul
+**Session 1:** Multi-agent system implementation

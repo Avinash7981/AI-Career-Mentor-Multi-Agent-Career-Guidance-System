@@ -11,8 +11,9 @@ export default function ChatMessage({ msg }) {
   // Only parse resume dashboard for completed resume_agent responses (not streaming)
   const resumeData = useMemo(() => {
     if (!isBot || msg.agent !== "resume_agent" || msg.streaming) return null;
+    if (msg.agents && msg.agents.length > 1) return null; // Multi-agent response, use markdown
     return parseResumeResponse(msg.text);
-  }, [isBot, msg.agent, msg.text, msg.streaming]);
+  }, [isBot, msg.agent, msg.agents, msg.text, msg.streaming]);
 
   return (
     <div className={`chat-msg ${msg.type}`}>
@@ -24,7 +25,13 @@ export default function ChatMessage({ msg }) {
         )}
       </div>
       <div className="msg-content">
-        {isBot && msg.agent && <AgentBadge agent={msg.agent} />}
+        {isBot && msg.agents && msg.agents.length > 1 ? (
+          <div className="multi-agent-badges">
+            {msg.agents.map((a) => <AgentBadge key={a} agent={a} />)}
+          </div>
+        ) : (
+          isBot && msg.agent && <AgentBadge agent={msg.agent} />
+        )}
         <div className="msg-text">
           {isBot ? (
             <>

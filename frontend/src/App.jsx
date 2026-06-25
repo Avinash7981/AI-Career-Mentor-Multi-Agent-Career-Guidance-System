@@ -12,8 +12,8 @@ import {
   X,
 } from "lucide-react";
 import ChatMessage from "./components/ChatMessage";
+import AgentBadge from "./components/AgentBadge";
 import WelcomeScreen from "./components/WelcomeScreen";
-import LoadingIndicator from "./components/LoadingIndicator";
 import FileAttachment from "./components/FileAttachment";
 import ErrorMessage from "./components/ErrorMessage";
 
@@ -43,6 +43,8 @@ function App() {
   const [streaming, setStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");
   const [streamingAgent, setStreamingAgent] = useState(null);
+  const [streamingAgents, setStreamingAgents] = useState([]);
+  const [streamingProgress, setStreamingProgress] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [sessionId, setSessionId] = useState(() => {
@@ -134,6 +136,8 @@ function App() {
     setStreaming(true);
     setStreamingText("");
     setStreamingAgent(null);
+    setStreamingAgents([]);
+    setStreamingProgress("");
 
     try {
       const response = await fetch("http://localhost:3001/chat/stream", {
@@ -151,6 +155,7 @@ function App() {
       let buffer = "";
       let accumulatedText = "";
       let detectedAgent = "orchestrator_agent";
+      let allAgents = [];
 
       while (true) {
         const { done, value } = await reader.read();
@@ -171,29 +176,45 @@ function App() {
             if (event.type === "agent") {
               detectedAgent = event.agent;
               setStreamingAgent(event.agent);
+              if (event.agents) {
+                allAgents = event.agents;
+                setStreamingAgents([...event.agents]);
+              } else if (!allAgents.includes(event.agent)) {
+                allAgents.push(event.agent);
+                setStreamingAgents([...allAgents]);
+              }
+            } else if (event.type === "progress") {
+              setStreamingProgress(event.status);
             } else if (event.type === "text") {
               accumulatedText += event.content;
               setStreamingText(accumulatedText);
+              setStreamingProgress(""); // Clear progress once text arrives
             } else if (event.type === "done") {
               detectedAgent = event.agent || detectedAgent;
+              if (event.agents) allAgents = event.agents;
             } else if (event.type === "error") {
               throw new Error(event.message || "Stream error");
             }
           } catch (parseErr) {
             if (parseErr.message !== "Stream error" && !parseErr.message.startsWith("HTTP")) {
-              continue; // Skip malformed SSE lines
+              continue;
             }
             throw parseErr;
           }
         }
       }
 
-      // Finalize: add bot message to chat
+      // Finalize: add bot message with all participating agents
       const finalChats = updatedChats.map((chat) => {
         if (chat.id === chatId) {
           return {
             ...chat,
-            messages: [...chat.messages, { type: "bot", text: accumulatedText, agent: detectedAgent }],
+            messages: [...chat.messages, {
+              type: "bot",
+              text: accumulatedText,
+              agent: detectedAgent,
+              agents: allAgents.length > 1 ? allAgents : undefined,
+            }],
           };
         }
         return chat;
@@ -217,6 +238,8 @@ function App() {
       setStreaming(false);
       setStreamingText("");
       setStreamingAgent(null);
+      setStreamingAgents([]);
+      setStreamingProgress("");
     }
   };
 
@@ -393,9 +416,24 @@ function App() {
                 )
               )}
               {streaming && streamingText && (
-                <ChatMessage msg={{ type: "bot", text: streamingText, agent: streamingAgent, streaming: true }} />
+                <ChatMessage msg={{ type: "bot", text: streamingText, agent: streamingAgent, agents: streamingAgents.length > 1 ? streamingAgents : undefined, streaming: true }} />
               )}
-              {loading && !streamingText && <LoadingIndicator />}
+              {loading && !streamingText && (
+                <div className="chat-msg bot">
+                  <div className="msg-avatar"><div className="avatar-bot">AI</div></div>
+                  <div className="msg-content">
+                    {streamingAgents.length > 0 && (
+                      <div className="multi-agent-badges">
+                        {streamingAgents.map((a) => <AgentBadge key={a} agent={a} />)}
+                      </div>
+                    )}
+                    <div className="loading-indicator">
+                      <div className="loading-dots"><span></span><span></span><span></span></div>
+                      <span className="loading-text">{streamingProgress || "Thinking..."}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
           )}

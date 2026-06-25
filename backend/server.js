@@ -468,7 +468,7 @@ app.post("/chat", async (req, res) => {
 });
 
 // ============================================================
-// POST /chat/stream - SSE streaming endpoint
+// POST /chat/stream - SSE streaming endpoint (supports multi-agent)
 // ============================================================
 app.post("/chat/stream", async (req, res) => {
     const {
@@ -517,9 +517,13 @@ app.post("/chat/stream", async (req, res) => {
             }]
         };
 
-        let routedAgent = "orchestrator_agent";
+        // Multi-agent tracking
+        const agents = []; // All agents that participated
+        let currentAgent = null;
         let fullText = "";
-        let sentAgent = false;
+
+        // Send planning event
+        res.write(`data: ${JSON.stringify({ type: "progress", status: "Planning..." })}\n\n`);
 
         for await (const event of runner.runAsync({
             userId,
@@ -527,23 +531,27 @@ app.post("/chat/stream", async (req, res) => {
             newMessage
         })) {
             if (closed) break;
-
             if (!event.content || !event.content.parts) continue;
 
             for (const part of event.content.parts) {
                 if (closed) break;
 
-                // Track routing
+                // Track routing — detect when a new agent is called
                 if (part.functionCall) {
-                    routedAgent = part.functionCall.name;
-                    // Send agent info as soon as we know which specialist is handling it
-                    if (!sentAgent) {
-                        res.write(`data: ${JSON.stringify({ type: "agent", agent: routedAgent })}\n\n`);
-                        sentAgent = true;
+                    const agentName = part.functionCall.name;
+                    if (agentName !== currentAgent) {
+                        currentAgent = agentName;
+                        if (!agents.includes(agentName)) {
+                            agents.push(agentName);
+                        }
+                        // Send agent event + progress
+                        const progressLabel = getAgentProgressLabel(agentName);
+                        res.write(`data: ${JSON.stringify({ type: "agent", agent: agentName, agents })}\n\n`);
+                        res.write(`data: ${JSON.stringify({ type: "progress", status: progressLabel })}\n\n`);
                     }
                 }
 
-                // Extract text from functionResponse (specialist agent output)
+                // Extract text from functionResponse
                 if (part.functionResponse) {
                     const resp = part.functionResponse.response;
                     let text = null;
@@ -555,7 +563,6 @@ app.post("/chat/stream", async (req, res) => {
 
                     if (text) {
                         fullText += text;
-                        // Stream the text in chunks for progressive rendering
                         const chunks = text.match(/.{1,80}/gs) || [text];
                         for (const chunk of chunks) {
                             if (closed) break;
@@ -564,7 +571,7 @@ app.post("/chat/stream", async (req, res) => {
                     }
                 }
 
-                // Direct text from orchestrator's final response
+                // Direct text from orchestrator
                 if (part.text && !part.thought) {
                     fullText += part.text;
                     const chunks = part.text.match(/.{1,80}/gs) || [part.text];
@@ -576,19 +583,14 @@ app.post("/chat/stream", async (req, res) => {
             }
         }
 
-        // If we never identified a specialist, send orchestrator as agent
-        if (!sentAgent) {
-            res.write(`data: ${JSON.stringify({ type: "agent", agent: routedAgent })}\n\n`);
-        }
-
-        // Update session state from full response
-        const agent = routedAgent !== "orchestrator_agent" ? routedAgent : "orchestrator_agent";
+        // Determine primary agent for session state update
+        const primaryAgent = agents.length > 0 ? agents[0] : "orchestrator_agent";
         if (fullText) {
-            updateSessionFromResponse(sessionId, agent, fullText);
+            updateSessionFromResponse(sessionId, primaryAgent, fullText);
         }
 
-        // Send done event
-        res.write(`data: ${JSON.stringify({ type: "done", sessionId, agent })}\n\n`);
+        // Send done event with all participating agents
+        res.write(`data: ${JSON.stringify({ type: "done", sessionId, agent: primaryAgent, agents })}\n\n`);
         res.end();
 
     } catch (error) {
@@ -605,6 +607,22 @@ app.post("/chat/stream", async (req, res) => {
         }
     }
 });
+
+/**
+ * Returns a user-friendly progress label for a given agent.
+ */
+function getAgentProgressLabel(agentName) {
+    switch (agentName) {
+        case "resume_agent":
+            return "Reviewing Resume...";
+        case "career_agent":
+            return "Generating Career Advice...";
+        case "interview_agent":
+            return "Preparing Interview Guidance...";
+        default:
+            return "Thinking...";
+    }
+}
 
 // ============================================================
 // POST /upload-resume - Resume upload, parsed then sent to agents

@@ -1363,3 +1363,15 @@ details[open] .rd-raw-toggle::before {
     max-height: 400px;
     overflow-y: auto;
 }
+
+
+/* ========================================
+   Multi-Agent Badges
+   ======================================== */
+
+.multi-agent-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+}
