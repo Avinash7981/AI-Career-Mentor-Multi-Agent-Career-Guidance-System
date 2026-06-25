@@ -1,5 +1,5 @@
-console.log("SERVER STARTED");
 require("dotenv").config();
+const DEBUG = process.env.DEBUG === "true";
 
 const express = require("express");
 const cors = require("cors");
@@ -168,18 +168,18 @@ async function runAgent(userId, sessionId, messageText) {
                     return "unknown";
                 }).join(", ") :
                 "no-parts";
-            console.log(`[EVENT] author=${event.author} | parts=[${partTypes}]`);
+            if (DEBUG) console.log(`[EVENT] author=${event.author} | parts=[${partTypes}]`);
         }
 
         // Process parts
         if (event.content && event.content.parts) {
             for (const part of event.content.parts) {
                 if (part.functionCall) {
-                    console.log(`[ROUTING] -> ${part.functionCall.name}`);
+                    if (DEBUG) console.log(`[ROUTING] -> ${part.functionCall.name}`);
                     routedAgent = part.functionCall.name;
                 }
                 if (part.functionResponse) {
-                    console.log(`[ROUTING] <- ${part.functionResponse.name} responded`);
+                    if (DEBUG) console.log(`[ROUTING] <- ${part.functionResponse.name} responded`);
                     // Extract text from functionResponse — this is where specialist output lives
                     const resp = part.functionResponse.response;
                     if (resp) {
@@ -196,7 +196,7 @@ async function runAgent(userId, sessionId, messageText) {
                             // Try to stringify
                             functionResponseText = JSON.stringify(resp);
                         }
-                        console.log(`[ROUTING] <- text extracted (${functionResponseText ? functionResponseText.length : 0} chars)`);
+                        if (DEBUG) console.log(`[ROUTING] <- text extracted (${functionResponseText ? functionResponseText.length : 0} chars)`);
                     }
                 }
                 // Track text events (orchestrator's final summarization)
@@ -234,7 +234,7 @@ async function runAgent(userId, sessionId, messageText) {
     // Use the routed agent name (from function call) or fallback to event author
     const agent = routedAgent !== "orchestrator_agent" ? routedAgent : "orchestrator_agent";
 
-    console.log(`[RESULT] Final agent: ${agent}, reply length: ${reply.length}`);
+    if (DEBUG) console.log(`[RESULT] Final agent: ${agent}, reply length: ${reply.length}`);
 
     // Task 7.2: Update session state based on which agent responded
     updateSessionFromResponse(sessionId, agent, reply);
@@ -264,7 +264,7 @@ function updateSessionFromResponse(sessionId, agent, reply) {
 
             if (Object.keys(updates).length > 0) {
                 sessionManager.updateState(sessionId, updates);
-                console.log("[Context] Resume Agent updated state:", Object.keys(updates));
+                if (DEBUG) console.log("[Context] Resume Agent updated state:", Object.keys(updates));
             }
         } else if (agent === "career_agent") {
             // Extract career goals and recommended skills
@@ -279,7 +279,7 @@ function updateSessionFromResponse(sessionId, agent, reply) {
 
             if (Object.keys(updates).length > 0) {
                 sessionManager.updateState(sessionId, updates);
-                console.log("[Context] Career Agent updated state:", Object.keys(updates));
+                if (DEBUG) console.log("[Context] Career Agent updated state:", Object.keys(updates));
             }
         } else if (agent === "interview_agent") {
             // Append to interview history
@@ -450,10 +450,6 @@ app.post("/chat", async (req, res) => {
             agent
         } = await runAgent(userId, sessionId, enrichedMessage);
 
-        console.log("========== AGENT RESPONSE ==========");
-        console.log("Agent:", agent);
-        console.log("Reply:", reply.substring(0, 200) + "...");
-        console.log("====================================");
 
         res.json({
             reply,
@@ -661,10 +657,6 @@ app.post("/upload-resume", upload.single("resume"), async (req, res) => {
             agent
         } = await runAgent(userId, sessionId, analysisPrompt);
 
-        console.log("========== RESUME ANALYSIS ==========");
-        console.log("Agent:", agent);
-        console.log("Analysis length:", reply.length);
-        console.log("=====================================");
 
         res.json({
             analysis: reply,
