@@ -1,6 +1,6 @@
 # 03 - Progress
 
-## Completion: 100% (Core + UI + Streaming + Markdown)
+## Completion: 100% (Core + UI + Streaming + Markdown + Resume Dashboard)
 
 ## Completed Tasks
 
@@ -16,24 +16,25 @@
 | 8 | Final E2E verification | fe05c653 | ✅ |
 | 9 | Frontend UI overhaul (professional redesign) | c14a204d | ✅ |
 | 10 | Streaming responses (SSE) | 6412b31e | ✅ |
-| 11 | Professional markdown rendering | pending | ✅ |
+| 11 | Professional markdown rendering | 60240bf4 | ✅ |
+| 12 | Resume Dashboard (interactive UI) | pending | ✅ |
 
-## Markdown Rendering Features
+## Resume Dashboard Features
 
-- Syntax-highlighted code blocks (Prism theme: oneDark)
-- Copy Code button with "Copied!" confirmation
-- Language badge on code blocks
-- Responsive tables with scroll wrapper
-- External links open in new tab
-- Blockquotes with blue left border
-- Inline code with distinct styling
-- Horizontal rules
-- Works seamlessly with streaming (progressive render)
+- Animated circular score (color-coded: green/orange/red)
+- Category progress bars (ATS, Formatting, Content, etc.)
+- Strengths as green chips with staggered animation
+- Weaknesses as red chips
+- Skills extracted with category grouping
+- Improvement suggestions with priority badges (high/med/low)
+- Copy Review + Download MD action buttons
+- Expandable raw markdown view
+- Only triggers for resume_agent responses
+- Falls back to MarkdownRenderer if parsing fails
 
 ## Remaining Milestones
 
 - [ ] Live end-to-end test with actual API key
-- [ ] Verify streaming + markdown works with all 3 agents
 - [ ] Deploy (Render backend + Vercel frontend)
 - [ ] Write hackathon submission README
 - [ ] Record demo video

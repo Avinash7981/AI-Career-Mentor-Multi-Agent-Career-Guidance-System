@@ -1006,3 +1006,360 @@ body {
     border-top: 1px solid #2a2a2a;
     margin: 16px 0;
 }
+
+
+/* ========================================
+   Resume Dashboard
+   ======================================== */
+
+.resume-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.rd-section {
+    padding: 16px;
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+}
+
+.rd-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f4f4f5;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+/* Score Circle */
+
+.rd-score-section {
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+}
+
+.score-circle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.score-circle-container svg {
+    display: block;
+}
+
+.score-circle-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+}
+
+.score-number {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.score-total {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+.score-label {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #71717a;
+    font-weight: 500;
+}
+
+/* Category Bars */
+
+.rd-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rd-category {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rd-cat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rd-cat-name {
+    font-size: 12px;
+    color: #a1a1aa;
+}
+
+.rd-cat-score {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.rd-progress-track {
+    height: 6px;
+    background: #1e1e1e;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.rd-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+}
+
+/* Chips (Strengths / Weaknesses) */
+
+.rd-chips-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.rd-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    animation: fadeInUp 0.3s ease backwards;
+}
+
+.rd-chip:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.rd-chip:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.rd-chip:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.rd-chip:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.rd-chip:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.rd-chip-green {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.rd-chip-red {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Skills */
+
+.rd-skills {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rd-skill-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rd-skill-category {
+    font-size: 11px;
+    font-weight: 600;
+    color: #71717a;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.rd-skill-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.rd-skill-chip {
+    padding: 3px 8px;
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #a5b4fc;
+    font-weight: 500;
+}
+
+/* Improvements */
+
+.rd-improvements {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rd-improvement {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #0f0f0f;
+    border-radius: 6px;
+    border: 1px solid #1e1e1e;
+}
+
+.rd-imp-text {
+    flex: 1;
+    font-size: 12px;
+    color: #e4e4e7;
+    line-height: 1.4;
+}
+
+.rd-imp-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+}
+
+.rd-imp-high {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+.rd-imp-medium {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+}
+
+.rd-imp-low {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+}
+
+.priority-high {
+    color: #f87171;
+}
+
+.priority-med {
+    color: #fbbf24;
+}
+
+.priority-low {
+    color: #4ade80;
+}
+
+/* Actions */
+
+.rd-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.rd-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 12px;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    background: #141414;
+    color: #e4e4e7;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.rd-action-btn:hover {
+    background: #1e1e1e;
+    border-color: #3a3a3a;
+}
+
+.rd-action-secondary {
+    color: #71717a;
+}
+
+/* Raw Section Toggle */
+
+.rd-raw-section {
+    border: 1px solid #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.rd-raw-toggle {
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #71717a;
+    cursor: pointer;
+    background: #141414;
+    list-style: none;
+    transition: color 0.15s ease;
+}
+
+.rd-raw-toggle:hover {
+    color: #a1a1aa;
+}
+
+.rd-raw-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.rd-raw-toggle::before {
+    content: "▸ ";
+}
+
+details[open] .rd-raw-toggle::before {
+    content: "▾ ";
+}
+
+.rd-raw-content {
+    padding: 14px;
+    border-top: 1px solid #1e1e1e;
+    max-height: 400px;
+    overflow-y: auto;
+}
