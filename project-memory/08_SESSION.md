@@ -2,28 +2,27 @@
 
 ## Latest Session
 
-**Date:** 2025-06-25 (session 9 - Mock Interview)
+**Date:** 2025-06-25 (session 10 - Career Roadmap)
 
 **Work Completed:**
-1. InterviewSetupModal: role input, experience level, interview type grid, question count
-2. InterviewProgress: sticky progress bar with Q/total, time estimate
-3. InterviewFinalDashboard: parsed score, categories, strengths/weaknesses, hiring rec
-4. App.jsx: interview state (active, config, question tracking), handleInterviewStart
-5. ChatMessage: detects interview final reports → renders InterviewFinalDashboard
-6. WelcomeScreen: added "Mock Interview" quick action card
-7. Interview tracking: increments question on each bot response during active interview
-8. Full CSS for setup modal, progress bar, final dashboard
+1. RoadmapSetupModal: education, skills, dream role, experience, timeline, target company
+2. parseRoadmapResponse.js: extracts timeline, skills with priority/hours, courses, projects, milestones
+3. CareerRoadmapDashboard: animated timeline, skill cards, course search, project grid, milestone bars
+4. App.jsx: showRoadmapModal state, handleRoadmapSubmit with structured prompt
+5. ChatMessage: auto-detects career_agent roadmap responses → renders dashboard
+6. WelcomeScreen: "Career Roadmap" now opens setup modal
+7. CSS: timeline with dots/lines, skill/project/course cards, milestone bars
 
 **Files Created:**
-- frontend/src/components/interview/InterviewSetupModal.jsx
-- frontend/src/components/interview/InterviewProgress.jsx
-- frontend/src/components/interview/InterviewFinalDashboard.jsx
+- frontend/src/components/roadmap/RoadmapSetupModal.jsx
+- frontend/src/components/roadmap/parseRoadmapResponse.js
+- frontend/src/components/roadmap/CareerRoadmapDashboard.jsx
 
 **Files Modified:**
-- frontend/src/App.jsx (interview state, modal, start handler, progress tracking)
-- frontend/src/App.css (interview modal, progress, dashboard styles)
-- frontend/src/components/ChatMessage.jsx (interview report detection + dashboard)
-- frontend/src/components/WelcomeScreen.jsx (Mock Interview card)
+- frontend/src/App.jsx (roadmap modal state, handler, render)
+- frontend/src/App.css (timeline, skills, courses, projects, milestones)
+- frontend/src/components/ChatMessage.jsx (roadmap detection + dashboard render)
+- frontend/src/components/WelcomeScreen.jsx (Career Roadmap uses __CAREER_ROADMAP__)
 
 **Current Blockers:**
 - None — build passes, lint clean
@@ -34,6 +33,7 @@
 
 ## Previous Sessions
 
+**Session 9:** Mock Interview system
 **Session 8:** ATS Analyzer
 **Session 7:** Production UX
 **Session 6:** Multi-agent orchestration

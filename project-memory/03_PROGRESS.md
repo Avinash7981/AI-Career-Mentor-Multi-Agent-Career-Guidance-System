@@ -1,6 +1,6 @@
 # 03 - Progress
 
-## Completion: 100% (Full Feature Set + Flagship Features)
+## Completion: 100% (All Flagship Features)
 
 ## Completed Tasks
 
@@ -15,18 +15,14 @@
 | 14 | Production UX upgrade | ✅ |
 | 15 | ATS Resume vs JD Analyzer | ✅ |
 | 16 | AI Mock Interview System | ✅ |
+| 17 | AI Career Roadmap Generator | ✅ |
 
-## Mock Interview Features
+## Four Flagship Features
 
-- InterviewSetupModal: role, experience level, interview type, question count
-- Interview types: HR, Technical, Behavioral (STAR), Mixed
-- Question counts: 3, 5, 8, or 10
-- InterviewProgress: sticky progress bar (Q2/10), remaining time estimate
-- Per-answer scoring prompt (Communication, Technical, Confidence, Problem Solving, Completeness)
-- InterviewFinalDashboard: circular overall score, category bars, strengths/weaknesses, hiring recommendation
-- Auto-detects final report in interview_agent responses
-- Download report, retry interview actions
-- Reuses existing interview_agent + streaming
+1. **Resume Dashboard** — ATS score, categories, strengths/weaknesses, skills, improvements
+2. **ATS Job Match** — Resume vs JD comparison, keyword analysis, AI rewrites
+3. **Mock Interview** — Setup → Q&A → per-answer feedback → final report dashboard
+4. **Career Roadmap** — Timeline view, skills with priority/hours, courses, projects, milestones
 
 ## Remaining Milestones
 

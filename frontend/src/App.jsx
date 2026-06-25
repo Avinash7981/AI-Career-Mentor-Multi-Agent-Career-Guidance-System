@@ -22,6 +22,7 @@ import ErrorMessage from "./components/ErrorMessage";
 import ATSInputModal from "./components/ats/ATSInputModal";
 import InterviewSetupModal from "./components/interview/InterviewSetupModal";
 import InterviewProgress from "./components/interview/InterviewProgress";
+import RoadmapSetupModal from "./components/roadmap/RoadmapSetupModal";
 
 function generateId() {
   return crypto.randomUUID();
@@ -61,6 +62,7 @@ function App() {
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [showATSModal, setShowATSModal] = useState(false);
   const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const [showRoadmapModal, setShowRoadmapModal] = useState(false);
   const [interviewActive, setInterviewActive] = useState(false);
   const [interviewConfig, setInterviewConfig] = useState(null);
   const [interviewQuestion, setInterviewQuestion] = useState(0);
@@ -306,6 +308,44 @@ function App() {
     }
   };
 
+  const handleRoadmapSubmit = (config) => {
+    const prompt = `Generate a detailed, personalized career roadmap for me.
+
+My details:
+- Dream Role: ${config.dreamRole}
+- Current Education: ${config.education || "Not specified"}
+- Current Skills: ${config.skills || "Not specified"}
+- Experience Level: ${config.experience}
+- Timeline: ${config.timeAvailable}
+${config.targetCompany ? `- Target Company: ${config.targetCompany}` : ""}
+
+Please provide a structured roadmap with these EXACT sections:
+
+## Month 1: [Focus Area]
+- [specific tasks]
+
+## Month 2: [Focus Area]
+- [specific tasks]
+
+(continue for full timeline)
+
+## Required Skills
+- [skill] - Priority: high/medium/low - Estimated: X hours
+
+## Courses and Resources
+- [resource name] - free/paid
+
+## Practice Projects
+- [project] - Difficulty: beginner/intermediate/advanced
+
+## Milestones
+1. [25% milestone]
+2. [50% milestone]
+3. [75% milestone]
+4. [100% milestone]`;
+    handleSend(prompt);
+  };
+
   const handleInterviewStart = (config) => {
     setInterviewConfig(config);
     setInterviewActive(true);
@@ -502,6 +542,7 @@ function App() {
             <WelcomeScreen onSelectAction={(prompt) => {
               if (prompt === "__ATS_ANALYZE__") { setShowATSModal(true); return; }
               if (prompt === "__MOCK_INTERVIEW__") { setShowInterviewModal(true); return; }
+              if (prompt === "__CAREER_ROADMAP__") { setShowRoadmapModal(true); return; }
               handleSend(prompt);
             }} />
           ) : (
@@ -599,6 +640,14 @@ function App() {
         <InterviewSetupModal
           onStart={handleInterviewStart}
           onClose={() => setShowInterviewModal(false)}
+        />
+      )}
+
+      {/* Roadmap Setup Modal */}
+      {showRoadmapModal && (
+        <RoadmapSetupModal
+          onSubmit={handleRoadmapSubmit}
+          onClose={() => setShowRoadmapModal(false)}
         />
       )}
     </div>

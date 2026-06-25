@@ -7,6 +7,8 @@ import { parseResumeResponse } from "./resume/parseResumeResponse";
 import ATSDashboard from "./ats/ATSDashboard";
 import { parseATSResponse } from "./ats/parseATSResponse";
 import InterviewFinalDashboard from "./interview/InterviewFinalDashboard";
+import CareerRoadmapDashboard from "./roadmap/CareerRoadmapDashboard";
+import { parseRoadmapResponse } from "./roadmap/parseRoadmapResponse";
 import { User } from "lucide-react";
 
 function formatTime(timestamp) {
@@ -47,6 +49,14 @@ export default function ChatMessage({ msg, onRegenerate }) {
     return /(?:final\s*report|overall\s*(?:interview\s*)?score[:\s]*\d|hiring\s*recommendation)/i.test(msg.text || "");
   }, [isBot, msg.agent, msg.text, msg.streaming]);
 
+  const roadmapData = useMemo(() => {
+    if (!isBot || msg.streaming || msg.agent !== "career_agent") return null;
+    if (msg.agents && msg.agents.length > 1) return null;
+    // Detect roadmap responses (contain month/phase timeline patterns)
+    if (!/(?:month\s*\d|phase\s*\d|week\s*\d|required\s*skills|milestones?)/i.test(msg.text || "")) return null;
+    return parseRoadmapResponse(msg.text);
+  }, [isBot, msg.agent, msg.agents, msg.text, msg.streaming]);
+
   return (
     <div className={`chat-msg ${msg.type} msg-animate`}>
       <div className="msg-avatar">
@@ -73,6 +83,8 @@ export default function ChatMessage({ msg, onRegenerate }) {
                 <ResumeDashboard data={resumeData} />
               ) : isInterviewReport ? (
                 <InterviewFinalDashboard text={msg.text} />
+              ) : roadmapData ? (
+                <CareerRoadmapDashboard data={roadmapData} />
               ) : (
                 <MarkdownRenderer content={msg.text || ""} />
               )}

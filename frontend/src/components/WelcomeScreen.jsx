@@ -25,8 +25,8 @@ const quickActions = [
   {
     icon: Briefcase,
     title: "Career Roadmap",
-    description: "Plan your career path forward",
-    prompt: "Generate a comprehensive career plan for me. Include career paths, recommended skills, a learning roadmap, and internship recommendations.",
+    description: "Personalized step-by-step career plan",
+    prompt: "__CAREER_ROADMAP__",
     color: "#10b981",
   },
   {
