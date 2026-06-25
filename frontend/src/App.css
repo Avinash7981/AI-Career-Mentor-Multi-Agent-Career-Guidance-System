@@ -2407,3 +2407,504 @@ details[open] .rd-raw-toggle::before {
     font-weight: 600;
     color: #8b5cf6;
 }
+
+
+/* ========================================
+   Login Page
+   ======================================== */
+
+.login-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #0f0f0f;
+    padding: 20px;
+}
+
+.login-card {
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 380px;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.login-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #f4f4f5;
+    margin: 12px 0 4px;
+}
+
+.login-header p {
+    font-size: 13px;
+    color: #71717a;
+}
+
+.login-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+
+.login-google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    background: transparent;
+    color: #e4e4e7;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.login-google-btn:hover {
+    background: #1e1e1e;
+}
+
+.login-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+    color: #52525b;
+    font-size: 12px;
+}
+
+.login-divider::before,
+.login-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #1e1e1e;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.login-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    background: #0f0f0f;
+    color: #71717a;
+    transition: border-color 0.15s ease;
+}
+
+.login-field:focus-within {
+    border-color: #3b82f6;
+}
+
+.login-field input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #e4e4e7;
+    font-size: 13px;
+    outline: none;
+}
+
+.login-submit-btn {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    background: #3b82f6;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.15s ease;
+}
+
+.login-submit-btn:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.login-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.login-toggle {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 12px;
+    color: #71717a;
+}
+
+.login-toggle button {
+    border: none;
+    background: none;
+    color: #60a5fa;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 4px;
+}
+
+/* ========================================
+   Dashboard Page
+   ======================================== */
+
+.dashboard-page {
+    padding: 32px;
+    max-width: 900px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #0f0f0f;
+}
+
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+}
+
+.dash-greeting h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f4f4f5;
+    margin-bottom: 4px;
+}
+
+.dash-greeting p {
+    font-size: 13px;
+    color: #71717a;
+}
+
+.dash-new-chat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    background: #3b82f6;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+}
+
+.dash-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.dash-stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px;
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+}
+
+.dash-stat-icon {
+    color: #71717a;
+}
+
+.dash-stat-num {
+    font-size: 22px;
+    font-weight: 700;
+    color: #f4f4f5;
+}
+
+.dash-stat-label {
+    font-size: 11px;
+    color: #71717a;
+}
+
+.dash-section {
+    margin-bottom: 24px;
+}
+
+.dash-section h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f4f4f5;
+    margin-bottom: 12px;
+}
+
+.dash-empty {
+    font-size: 13px;
+    color: #52525b;
+}
+
+.dash-recent {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dash-recent-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #a1a1aa;
+    transition: all 0.15s ease;
+}
+
+.dash-recent-card:hover {
+    background: #1e1e1e;
+    color: #e4e4e7;
+}
+
+.dash-recent-title {
+    flex: 1;
+    font-size: 13px;
+}
+
+.dash-recent-meta {
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #52525b;
+}
+
+.dash-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+}
+
+.dash-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 8px;
+    color: #e4e4e7;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.dash-action:hover {
+    background: #1e1e1e;
+    border-color: #2a2a2a;
+}
+
+/* ========================================
+   Settings Page
+   ======================================== */
+
+.settings-page {
+    padding: 32px;
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #0f0f0f;
+}
+
+.settings-page h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #f4f4f5;
+    margin-bottom: 24px;
+}
+
+.settings-section {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+}
+
+.settings-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f4f4f5;
+    margin-bottom: 12px;
+}
+
+.settings-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.settings-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.settings-avatar-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+}
+
+.settings-profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.settings-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f4f4f5;
+}
+
+.settings-email {
+    font-size: 12px;
+    color: #a1a1aa;
+}
+
+.settings-date {
+    font-size: 11px;
+    color: #52525b;
+}
+
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 13px;
+    color: #a1a1aa;
+}
+
+.settings-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #1e1e1e;
+    color: #a1a1aa;
+}
+
+.settings-badge-green {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+}
+
+.settings-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.settings-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    background: transparent;
+    color: #e4e4e7;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.settings-btn:hover {
+    background: #1e1e1e;
+}
+
+.settings-btn-danger {
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.settings-btn-danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.settings-btn-logout {
+    color: #f87171;
+    border: none;
+    padding-left: 0;
+}
+
+/* ========================================
+   Sidebar Footer (nav buttons)
+   ======================================== */
+
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid #1e1e1e;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sidebar-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #a1a1aa;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.sidebar-nav-btn:hover {
+    background: #1e1e1e;
+    color: #e4e4e7;
+}
+
+.sidebar-logout {
+    color: #f87171;
+}
+
+.sidebar-logout:hover {
+    background: rgba(239, 68, 68, 0.1);
+}

@@ -2,43 +2,46 @@
 
 ## Latest Session
 
-**Date:** 2025-06-25 (session 10 - Career Roadmap)
+**Date:** 2025-06-25 (session 11 - Auth + Workspace)
 
 **Work Completed:**
-1. RoadmapSetupModal: education, skills, dream role, experience, timeline, target company
-2. parseRoadmapResponse.js: extracts timeline, skills with priority/hours, courses, projects, milestones
-3. CareerRoadmapDashboard: animated timeline, skill cards, course search, project grid, milestone bars
-4. App.jsx: showRoadmapModal state, handleRoadmapSubmit with structured prompt
-5. ChatMessage: auto-detects career_agent roadmap responses → renders dashboard
-6. WelcomeScreen: "Career Roadmap" now opens setup modal
-7. CSS: timeline with dots/lines, skill/project/course cards, milestone bars
+1. Installed firebase + react-router-dom
+2. Firebase config with env vars (placeholder)
+3. AuthContext: Google login, email/password, register, logout, persistent session
+4. LoginPage: professional UI with Google + email form
+5. ProtectedRoute: redirects to /login if unauthenticated
+6. Dashboard page: stats cards, recent chats, quick actions
+7. Settings page: profile, theme, features toggle, export, delete account
+8. Updated main.jsx with BrowserRouter + Routes
+9. Updated App.jsx: user-scoped localStorage, sidebar nav (Dashboard/Settings/Logout)
+10. Full CSS for login, dashboard, settings, sidebar footer
 
 **Files Created:**
-- frontend/src/components/roadmap/RoadmapSetupModal.jsx
-- frontend/src/components/roadmap/parseRoadmapResponse.js
-- frontend/src/components/roadmap/CareerRoadmapDashboard.jsx
+- frontend/src/firebase.js
+- frontend/src/contexts/AuthContext.jsx
+- frontend/src/components/auth/LoginPage.jsx
+- frontend/src/components/auth/ProtectedRoute.jsx
+- frontend/src/pages/Dashboard.jsx
+- frontend/src/pages/Settings.jsx
 
 **Files Modified:**
-- frontend/src/App.jsx (roadmap modal state, handler, render)
-- frontend/src/App.css (timeline, skills, courses, projects, milestones)
-- frontend/src/components/ChatMessage.jsx (roadmap detection + dashboard render)
-- frontend/src/components/WelcomeScreen.jsx (Career Roadmap uses __CAREER_ROADMAP__)
+- frontend/src/main.jsx (router + auth provider)
+- frontend/src/App.jsx (user-scoped storage, nav buttons, useAuth)
+- frontend/src/App.css (login, dashboard, settings, sidebar footer)
+- frontend/package.json (firebase, react-router-dom)
 
 **Current Blockers:**
-- None — build passes, lint clean
+- Need actual Firebase project config to test auth
 
 **Next Task:**
-- Live test with Gemini API key
-- Deploy for hackathon
+- Add Firebase config values
+- Deploy
 
 ## Previous Sessions
 
-**Session 9:** Mock Interview system
+**Session 10:** Career Roadmap
+**Session 9:** Mock Interview
 **Session 8:** ATS Analyzer
 **Session 7:** Production UX
 **Session 6:** Multi-agent orchestration
-**Session 5:** CSS recovery
-**Session 4:** Markdown rendering
-**Session 3:** SSE streaming
-**Session 2:** UI overhaul
-**Session 1:** Multi-agent system
+**Session 5-1:** Core system + UI

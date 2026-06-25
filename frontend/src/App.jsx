@@ -2,6 +2,8 @@ import "./App.css";
 import { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext";
 import {
   Plus,
   Send,
@@ -13,6 +15,9 @@ import {
   X,
   Menu,
   ArrowDown,
+  LayoutDashboard,
+  Settings,
+  LogOut,
 } from "lucide-react";
 import ChatMessage from "./components/ChatMessage";
 import AgentBadge from "./components/AgentBadge";
@@ -39,13 +44,17 @@ function generateTitle(message) {
 }
 
 function App() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const storageKey = `careerChats_${user?.uid || "anon"}`;
+
   const [chats, setChats] = useState(() => {
-    const saved = JSON.parse(localStorage.getItem("careerChats") || "null");
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
     if (saved && saved.length > 0) return saved;
     return [];
   });
   const [currentChatId, setCurrentChatId] = useState(() => {
-    const saved = JSON.parse(localStorage.getItem("careerChats") || "null");
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
     return saved && saved.length > 0 ? saved[0].id : null;
   });
   const [input, setInput] = useState("");
@@ -103,7 +112,7 @@ function App() {
 
   const saveChats = (updatedChats) => {
     setChats(updatedChats);
-    localStorage.setItem("careerChats", JSON.stringify(updatedChats));
+    localStorage.setItem(storageKey, JSON.stringify(updatedChats));
   };
 
   const createNewChat = () => {
@@ -518,6 +527,18 @@ Please provide a structured roadmap with these EXACT sections:
             </div>
           ))}
         </nav>
+
+        <div className="sidebar-footer">
+          <button className="sidebar-nav-btn" onClick={() => navigate("/")}>
+            <LayoutDashboard size={14} /> Dashboard
+          </button>
+          <button className="sidebar-nav-btn" onClick={() => navigate("/settings")}>
+            <Settings size={14} /> Settings
+          </button>
+          <button className="sidebar-nav-btn sidebar-logout" onClick={() => { logout(); navigate("/login"); }}>
+            <LogOut size={14} /> Sign Out
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -655,8 +676,7 @@ Please provide a structured roadmap with these EXACT sections:
 }
 
 function sessionManager_getResumeFromStorage() {
-  // Check if we have a resume in the current session by looking at chat history
-  const chats = JSON.parse(localStorage.getItem("careerChats") || "[]");
+  const chats = JSON.parse(localStorage.getItem("careerChats") || localStorage.getItem(Object.keys(localStorage).find(k => k.startsWith("careerChats_")) || "") || "[]");
   return chats.some(c => c.messages && c.messages.some(m => m.agent === "resume_agent"));
 }
 
