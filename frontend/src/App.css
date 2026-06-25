@@ -1375,3 +1375,240 @@ details[open] .rd-raw-toggle::before {
     gap: 4px;
     margin-bottom: 8px;
 }
+
+
+/* ========================================
+   Message Actions (hover)
+   ======================================== */
+
+.msg-actions {
+    display: flex;
+    gap: 2px;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.chat-msg:hover .msg-actions {
+    opacity: 1;
+}
+
+.msg-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: #71717a;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.msg-action-btn:hover {
+    background: #1e1e1e;
+    color: #e4e4e7;
+}
+
+.msg-action-btn.active-like {
+    color: #22c55e;
+}
+
+.msg-action-btn.active-dislike {
+    color: #ef4444;
+}
+
+/* ========================================
+   Message Timestamp
+   ======================================== */
+
+.msg-timestamp {
+    display: block;
+    font-size: 10px;
+    color: #52525b;
+    margin-top: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.chat-msg:hover .msg-timestamp {
+    opacity: 1;
+}
+
+/* ========================================
+   Message Animations
+   ======================================== */
+
+.msg-animate {
+    animation: msgSlideIn 0.25s ease;
+}
+
+@keyframes msgSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   Stop Generating Button
+   ======================================== */
+
+.stop-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border: 1px solid #dc2626;
+    border-radius: 6px;
+    background: transparent;
+    color: #f87171;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.stop-btn:hover {
+    background: rgba(220, 38, 38, 0.1);
+}
+
+/* ========================================
+   Scroll to Bottom Button
+   ======================================== */
+
+.scroll-bottom-btn {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border: 1px solid #2a2a2a;
+    border-radius: 20px;
+    background: #141414;
+    color: #a1a1aa;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: all 0.15s ease;
+    animation: fadeIn 0.2s ease;
+}
+
+.scroll-bottom-btn:hover {
+    background: #1e1e1e;
+    color: #e4e4e7;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   Mobile Responsive
+   ======================================== */
+
+.mobile-header {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #1e1e1e;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f4f4f5;
+}
+
+.mobile-menu-btn {
+    border: none;
+    background: transparent;
+    color: #a1a1aa;
+    cursor: pointer;
+    display: flex;
+    padding: 4px;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 90;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        bottom: 0;
+        z-index: 100;
+        transition: left 0.25s ease;
+        width: 270px;
+        min-width: 270px;
+    }
+
+    .sidebar.sidebar-open {
+        left: 0;
+    }
+
+    .sidebar-overlay {
+        display: block;
+    }
+
+    .mobile-header {
+        display: flex;
+    }
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .messages-list {
+        padding: 16px 12px;
+    }
+
+    .input-area {
+        padding: 8px 12px 12px;
+    }
+
+    .msg-actions {
+        opacity: 1;
+    }
+
+    .msg-timestamp {
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   Focus States (Accessibility)
+   ======================================== */
+
+.new-chat-btn:focus-visible,
+.send-btn:focus-visible,
+.stop-btn:focus-visible,
+.attach-btn:focus-visible,
+.chat-item:focus-visible,
+.msg-action-btn:focus-visible,
+.quick-action-card:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}

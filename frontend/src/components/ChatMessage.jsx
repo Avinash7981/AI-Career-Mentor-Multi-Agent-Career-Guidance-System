@@ -1,22 +1,34 @@
 import { useMemo } from "react";
 import AgentBadge from "./AgentBadge";
 import MarkdownRenderer from "./MarkdownRenderer";
+import MessageActions from "./MessageActions";
 import ResumeDashboard from "./resume/ResumeDashboard";
 import { parseResumeResponse } from "./resume/parseResumeResponse";
 import { User } from "lucide-react";
 
-export default function ChatMessage({ msg }) {
+function formatTime(timestamp) {
+  if (!timestamp) return "";
+  const d = new Date(timestamp);
+  return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function formatFullTime(timestamp) {
+  if (!timestamp) return "";
+  const d = new Date(timestamp);
+  return d.toLocaleString([], { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
+}
+
+export default function ChatMessage({ msg, onRegenerate }) {
   const isBot = msg.type === "bot";
 
-  // Only parse resume dashboard for completed resume_agent responses (not streaming)
   const resumeData = useMemo(() => {
     if (!isBot || msg.agent !== "resume_agent" || msg.streaming) return null;
-    if (msg.agents && msg.agents.length > 1) return null; // Multi-agent response, use markdown
+    if (msg.agents && msg.agents.length > 1) return null;
     return parseResumeResponse(msg.text);
   }, [isBot, msg.agent, msg.agents, msg.text, msg.streaming]);
 
   return (
-    <div className={`chat-msg ${msg.type}`}>
+    <div className={`chat-msg ${msg.type} msg-animate`}>
       <div className="msg-avatar">
         {isBot ? (
           <div className="avatar-bot">AI</div>
@@ -46,6 +58,16 @@ export default function ChatMessage({ msg }) {
             <p>{msg.text}</p>
           )}
         </div>
+        {/* Timestamp */}
+        {msg.timestamp && (
+          <span className="msg-timestamp" title={formatFullTime(msg.timestamp)}>
+            {formatTime(msg.timestamp)}
+          </span>
+        )}
+        {/* Actions (bot messages only, not during streaming) */}
+        {isBot && !msg.streaming && msg.text && (
+          <MessageActions text={msg.text} onRegenerate={onRegenerate} />
+        )}
       </div>
     </div>
   );
