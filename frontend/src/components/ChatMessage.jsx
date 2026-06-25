@@ -1,6 +1,5 @@
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import AgentBadge from "./AgentBadge";
+import MarkdownRenderer from "./MarkdownRenderer";
 import { User } from "lucide-react";
 
 export default function ChatMessage({ msg }) {
@@ -20,7 +19,7 @@ export default function ChatMessage({ msg }) {
         <div className="msg-text">
           {isBot ? (
             <>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+              <MarkdownRenderer content={msg.text || ""} />
               {msg.streaming && <span className="streaming-cursor" />}
             </>
           ) : (

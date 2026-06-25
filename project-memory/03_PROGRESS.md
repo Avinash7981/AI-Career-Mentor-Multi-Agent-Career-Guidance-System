@@ -1,6 +1,6 @@
 # 03 - Progress
 
-## Completion: 100% (Core + UI + Streaming)
+## Completion: 100% (Core + UI + Streaming + Markdown)
 
 ## Completed Tasks
 
@@ -15,22 +15,25 @@
 | 7 | Inter-agent context sharing | 7f23c859 | ✅ |
 | 8 | Final E2E verification | fe05c653 | ✅ |
 | 9 | Frontend UI overhaul (professional redesign) | c14a204d | ✅ |
-| 10 | Streaming responses (SSE) | pending | ✅ |
+| 10 | Streaming responses (SSE) | 6412b31e | ✅ |
+| 11 | Professional markdown rendering | pending | ✅ |
 
-## Streaming Implementation
+## Markdown Rendering Features
 
-- Backend: POST /chat/stream (SSE endpoint)
-- Frontend: fetch + ReadableStream consumer
-- Blinking cursor during streaming
-- Agent badge shown before first token
-- Loading animation until first token arrives
-- Graceful error handling for stream failures
-- All existing endpoints preserved
+- Syntax-highlighted code blocks (Prism theme: oneDark)
+- Copy Code button with "Copied!" confirmation
+- Language badge on code blocks
+- Responsive tables with scroll wrapper
+- External links open in new tab
+- Blockquotes with blue left border
+- Inline code with distinct styling
+- Horizontal rules
+- Works seamlessly with streaming (progressive render)
 
 ## Remaining Milestones
 
 - [ ] Live end-to-end test with actual API key
-- [ ] Verify streaming works with all 3 agents
+- [ ] Verify streaming + markdown works with all 3 agents
 - [ ] Deploy (Render backend + Vercel frontend)
 - [ ] Write hackathon submission README
 - [ ] Record demo video

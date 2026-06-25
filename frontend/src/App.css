@@ -867,3 +867,142 @@ body {
         opacity: 1;
     }
 }
+
+
+/* ========================================
+   Code Blocks
+   ======================================== */
+
+.code-block {
+    margin: 12px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #2a2a2a;
+    background: #1e1e1e;
+}
+
+.code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    background: #1a1a1a;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.code-lang {
+    font-size: 11px;
+    font-weight: 500;
+    color: #71717a;
+    text-transform: lowercase;
+}
+
+.code-copy {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    color: #71717a;
+    font-size: 11px;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+
+.code-copy:hover {
+    color: #e4e4e7;
+    background: #2a2a2a;
+}
+
+/* Inline Code */
+
+.inline-code {
+    background: #1e1e1e;
+    border: 1px solid #2a2a2a;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: "SF Mono", Consolas, "Liberation Mono", monospace;
+    color: #a5b4fc;
+}
+
+/* ========================================
+   Tables
+   ======================================== */
+
+.table-wrapper {
+    overflow-x: auto;
+    margin: 12px 0;
+    border-radius: 8px;
+    border: 1px solid #2a2a2a;
+}
+
+.table-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.table-wrapper th,
+.table-wrapper td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.table-wrapper th {
+    background: #1a1a1a;
+    color: #f4f4f5;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.table-wrapper tr:last-child td {
+    border-bottom: none;
+}
+
+.table-wrapper tr:hover td {
+    background: #141414;
+}
+
+/* ========================================
+   Links
+   ======================================== */
+
+.md-link {
+    color: #60a5fa;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s ease;
+}
+
+.md-link:hover {
+    border-bottom-color: #60a5fa;
+}
+
+/* ========================================
+   Blockquotes
+   ======================================== */
+
+.chat-msg.bot .msg-text blockquote {
+    border-left: 3px solid #3b82f6;
+    padding-left: 14px;
+    margin: 12px 0;
+    color: #a1a1aa;
+    font-style: italic;
+}
+
+/* ========================================
+   Horizontal Rules
+   ======================================== */
+
+.chat-msg.bot .msg-text hr {
+    border: none;
+    border-top: 1px solid #2a2a2a;
+    margin: 16px 0;
+}
