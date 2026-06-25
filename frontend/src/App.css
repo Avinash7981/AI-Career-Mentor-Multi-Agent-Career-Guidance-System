@@ -2968,3 +2968,122 @@ details[open] .rd-raw-toggle::before {
     padding: 2px 6px;
     outline: none;
 }
+
+
+/* ========================================
+   Analytics Dashboard
+   ======================================== */
+
+.dash-insights {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.dash-insight-card {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #a1a1aa;
+}
+
+.dash-insight-card strong {
+    color: #f4f4f5;
+    margin-left: 2px;
+}
+
+.dash-charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.analytics-chart-card {
+    padding: 16px;
+    background: #141414;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+}
+
+.analytics-chart-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #a1a1aa;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Mini Bar Chart */
+
+.mini-bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 80px;
+}
+
+.mini-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+}
+
+.mini-bar {
+    width: 100%;
+    min-height: 2px;
+    background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+    border-radius: 3px 3px 0 0;
+    transition: height 0.4s ease;
+}
+
+.mini-bar-label {
+    font-size: 9px;
+    color: #52525b;
+    margin-top: 4px;
+}
+
+/* Mini Pie Chart */
+
+.mini-pie-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.mini-pie-svg {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+}
+
+.mini-pie-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pie-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #a1a1aa;
+}
+
+.pie-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}

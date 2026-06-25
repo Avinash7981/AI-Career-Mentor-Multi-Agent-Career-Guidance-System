@@ -1,6 +1,6 @@
 # 03 - Progress
 
-## Completion: 100% (Full SaaS Application)
+## Completion: 100% (Full SaaS + Analytics)
 
 ## Completed Tasks
 
@@ -18,23 +18,21 @@
 | 17 | AI Career Roadmap Generator | ✅ |
 | 18 | Firebase Auth + Dashboard + Settings | ✅ |
 | 19 | Authenticated Chat History | ✅ |
+| 20 | Analytics Dashboard | ✅ |
 
-## Authenticated Chat History
+## Analytics Dashboard Widgets
 
-- Per-user localStorage scoping (careerChats_{uid})
-- Chat object stores: title, createdAt, updatedAt, messages, pinned, agents[]
-- Auto-generated titles from first user message
-- Rename chat (inline edit in sidebar)
-- Delete chat
-- Pin chat (sorted to top, blue left border indicator)
-- Search chats by title
-- Participating agents tracked per conversation
-- updatedAt refreshed on every new message
-- Persists across page refreshes
+- Animated counters: Conversations, Total Messages, Resume Reviews, ATS, Interviews, Roadmaps
+- Insights row: Favorite Agent, Avg Conversation Length, Most Active Day, Longest Chat
+- Weekly Activity bar chart (SVG)
+- Agent Usage pie chart (SVG donut)
+- Feature Usage bar chart (SVG)
+- Recent Activity timeline
+- Quick Actions grid
 
 ## Remaining Milestones
 
 - [ ] Add Firebase config
-- [ ] Live test with Gemini API key
-- [ ] Deploy (Render + Vercel)
+- [ ] Live test with Gemini API
+- [ ] Deploy
 - [ ] Hackathon README
