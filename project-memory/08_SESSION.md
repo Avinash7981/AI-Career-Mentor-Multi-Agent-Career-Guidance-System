@@ -2,32 +2,31 @@
 
 ## Latest Session
 
-**Date:** 2025-06-25 (session 8 - ATS Analyzer)
+**Date:** 2025-06-25 (session 9 - Mock Interview)
 
 **Work Completed:**
-1. Backend: POST /ats-analyze endpoint (resume + job description, reuses resume_agent)
-2. ATSInputModal: paste JD + optional resume upload, validates inputs
-3. ATSDashboard: circular score, category bars, keyword chips, improvements with search, AI rewrites
-4. parseATSResponse.js: extracts structured data from markdown
-5. ChatMessage: auto-detects ATS responses via content pattern matching
-6. WelcomeScreen: added "ATS Job Match" quick action card
-7. App.jsx: showATSModal state, handleATSSubmit, special prompt handling
-8. Full CSS for modal, dashboard, keywords, rewrites
+1. InterviewSetupModal: role input, experience level, interview type grid, question count
+2. InterviewProgress: sticky progress bar with Q/total, time estimate
+3. InterviewFinalDashboard: parsed score, categories, strengths/weaknesses, hiring rec
+4. App.jsx: interview state (active, config, question tracking), handleInterviewStart
+5. ChatMessage: detects interview final reports → renders InterviewFinalDashboard
+6. WelcomeScreen: added "Mock Interview" quick action card
+7. Interview tracking: increments question on each bot response during active interview
+8. Full CSS for setup modal, progress bar, final dashboard
 
 **Files Created:**
-- frontend/src/components/ats/ATSInputModal.jsx
-- frontend/src/components/ats/ATSDashboard.jsx
-- frontend/src/components/ats/parseATSResponse.js
+- frontend/src/components/interview/InterviewSetupModal.jsx
+- frontend/src/components/interview/InterviewProgress.jsx
+- frontend/src/components/interview/InterviewFinalDashboard.jsx
 
 **Files Modified:**
-- backend/server.js (POST /ats-analyze endpoint)
-- frontend/src/App.jsx (modal state, ATS submit handler)
-- frontend/src/App.css (modal + ATS dashboard styles)
-- frontend/src/components/ChatMessage.jsx (ATS detection + ATSDashboard render)
-- frontend/src/components/WelcomeScreen.jsx (ATS quick action)
+- frontend/src/App.jsx (interview state, modal, start handler, progress tracking)
+- frontend/src/App.css (interview modal, progress, dashboard styles)
+- frontend/src/components/ChatMessage.jsx (interview report detection + dashboard)
+- frontend/src/components/WelcomeScreen.jsx (Mock Interview card)
 
 **Current Blockers:**
-- None — build passes, lint clean, backend valid
+- None — build passes, lint clean
 
 **Next Task:**
 - Live test with Gemini API key
@@ -35,7 +34,8 @@
 
 ## Previous Sessions
 
-**Session 7:** Production UX (actions, stop generating, timestamps, mobile)
+**Session 8:** ATS Analyzer
+**Session 7:** Production UX
 **Session 6:** Multi-agent orchestration
 **Session 5:** CSS recovery
 **Session 4:** Markdown rendering

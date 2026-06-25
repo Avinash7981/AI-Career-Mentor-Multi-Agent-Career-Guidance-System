@@ -1,4 +1,4 @@
-import { FileText, Briefcase, GraduationCap, BarChart3, Target } from "lucide-react";
+import { FileText, Briefcase, GraduationCap, BarChart3, Target, Mic } from "lucide-react";
 
 const quickActions = [
   {
@@ -16,6 +16,13 @@ const quickActions = [
     color: "#ef4444",
   },
   {
+    icon: Mic,
+    title: "Mock Interview",
+    description: "Practice with AI-powered mock interviews",
+    prompt: "__MOCK_INTERVIEW__",
+    color: "#8b5cf6",
+  },
+  {
     icon: Briefcase,
     title: "Career Roadmap",
     description: "Plan your career path forward",
@@ -25,16 +32,16 @@ const quickActions = [
   {
     icon: GraduationCap,
     title: "Interview Practice",
-    description: "Prepare with mock interviews",
+    description: "Quick Q&A interview prep",
     prompt: "I want to practice for interviews. Give me mock interview questions and help me prepare my answers using the STAR method.",
-    color: "#8b5cf6",
+    color: "#f59e0b",
   },
   {
     icon: BarChart3,
     title: "Skill Gap Analysis",
     description: "Identify skills you need to learn",
     prompt: "Perform a skill gap analysis for me. Identify what skills I'm missing for my target career and create a prioritized learning plan.",
-    color: "#f59e0b",
+    color: "#06b6d4",
   },
 ];
 

@@ -20,6 +20,8 @@ import WelcomeScreen from "./components/WelcomeScreen";
 import FileAttachment from "./components/FileAttachment";
 import ErrorMessage from "./components/ErrorMessage";
 import ATSInputModal from "./components/ats/ATSInputModal";
+import InterviewSetupModal from "./components/interview/InterviewSetupModal";
+import InterviewProgress from "./components/interview/InterviewProgress";
 
 function generateId() {
   return crypto.randomUUID();
@@ -58,6 +60,10 @@ function App() {
   const [showSidebar, setShowSidebar] = useState(false);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [showATSModal, setShowATSModal] = useState(false);
+  const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const [interviewActive, setInterviewActive] = useState(false);
+  const [interviewConfig, setInterviewConfig] = useState(null);
+  const [interviewQuestion, setInterviewQuestion] = useState(0);
   const [sessionId, setSessionId] = useState(() => {
     let stored = localStorage.getItem("sessionId");
     if (!stored) {
@@ -234,6 +240,19 @@ function App() {
       });
       saveChats(finalChats);
 
+      // Track interview progress
+      if (interviewActive && interviewConfig) {
+        const nextQ = interviewQuestion + 1;
+        if (nextQ > interviewConfig.questionCount) {
+          // Interview complete - check if this is the final report
+          if (/(?:final\s*report|overall\s*(?:interview\s*)?score|hiring\s*recommendation)/i.test(accumulatedText)) {
+            setInterviewActive(false);
+          }
+        } else {
+          setInterviewQuestion(nextQ);
+        }
+      }
+
     } catch (error) {
       if (error.name === "AbortError") {
         // User stopped generation — save partial text if any
@@ -285,6 +304,21 @@ function App() {
       saveChats(updatedChats);
       handleSend(lastUserMsg.text);
     }
+  };
+
+  const handleInterviewStart = (config) => {
+    setInterviewConfig(config);
+    setInterviewActive(true);
+    setInterviewQuestion(1);
+    const prompt = `You are conducting a mock ${config.type} interview for a ${config.role} position. ` +
+      `The candidate has ${config.experience} of experience. ` +
+      `You will ask exactly ${config.questionCount} questions, one at a time. ` +
+      `After I answer each question, score my answer (1-10) for: Communication, Technical Accuracy, Confidence, Problem Solving, Completeness. ` +
+      `Give brief feedback, then ask the next question. ` +
+      `After all ${config.questionCount} questions, provide a FINAL REPORT with: ` +
+      `Overall Interview Score: X/100, category scores, strengths, weaknesses, hiring recommendation. ` +
+      `Start with Question 1 now.`;
+    handleSend(prompt);
   };
 
   const handleATSSubmit = async ({ jobDescription, resumeFile }) => {
@@ -467,10 +501,14 @@ function App() {
           {isEmptyChat ? (
             <WelcomeScreen onSelectAction={(prompt) => {
               if (prompt === "__ATS_ANALYZE__") { setShowATSModal(true); return; }
+              if (prompt === "__MOCK_INTERVIEW__") { setShowInterviewModal(true); return; }
               handleSend(prompt);
             }} />
           ) : (
             <div className="messages-list">
+              {interviewActive && interviewConfig && (
+                <InterviewProgress current={interviewQuestion} total={interviewConfig.questionCount} role={interviewConfig.role} />
+              )}
               {currentChat.messages.map((msg, index) =>
                 msg.type === "error" ? (
                   <ErrorMessage key={index} text={msg.text}
@@ -553,6 +591,14 @@ function App() {
           onSubmit={handleATSSubmit}
           onClose={() => setShowATSModal(false)}
           hasResume={!!sessionManager_getResumeFromStorage()}
+        />
+      )}
+
+      {/* Interview Setup Modal */}
+      {showInterviewModal && (
+        <InterviewSetupModal
+          onStart={handleInterviewStart}
+          onClose={() => setShowInterviewModal(false)}
         />
       )}
     </div>

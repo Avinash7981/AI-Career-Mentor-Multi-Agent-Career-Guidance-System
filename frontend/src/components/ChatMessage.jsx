@@ -6,6 +6,7 @@ import ResumeDashboard from "./resume/ResumeDashboard";
 import { parseResumeResponse } from "./resume/parseResumeResponse";
 import ATSDashboard from "./ats/ATSDashboard";
 import { parseATSResponse } from "./ats/parseATSResponse";
+import InterviewFinalDashboard from "./interview/InterviewFinalDashboard";
 import { User } from "lucide-react";
 
 function formatTime(timestamp) {
@@ -41,6 +42,11 @@ export default function ChatMessage({ msg, onRegenerate }) {
     return null;
   }, [isBot, msg.agent, msg.text, msg.streaming, msg.atsAnalysis]);
 
+  const isInterviewReport = useMemo(() => {
+    if (!isBot || msg.streaming || msg.agent !== "interview_agent") return false;
+    return /(?:final\s*report|overall\s*(?:interview\s*)?score[:\s]*\d|hiring\s*recommendation)/i.test(msg.text || "");
+  }, [isBot, msg.agent, msg.text, msg.streaming]);
+
   return (
     <div className={`chat-msg ${msg.type} msg-animate`}>
       <div className="msg-avatar">
@@ -65,6 +71,8 @@ export default function ChatMessage({ msg, onRegenerate }) {
                 <ATSDashboard data={atsData} />
               ) : resumeData ? (
                 <ResumeDashboard data={resumeData} />
+              ) : isInterviewReport ? (
+                <InterviewFinalDashboard text={msg.text} />
               ) : (
                 <MarkdownRenderer content={msg.text || ""} />
               )}

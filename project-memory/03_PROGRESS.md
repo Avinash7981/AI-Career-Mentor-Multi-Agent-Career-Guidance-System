@@ -1,6 +1,6 @@
 # 03 - Progress
 
-## Completion: 100% (Full Feature Set)
+## Completion: 100% (Full Feature Set + Flagship Features)
 
 ## Completed Tasks
 
@@ -13,19 +13,20 @@
 | 12 | Resume Dashboard | ✅ |
 | 13 | Multi-agent orchestration | ✅ |
 | 14 | Production UX upgrade | ✅ |
-| 15 | ATS Resume vs Job Description Analyzer | ✅ |
+| 15 | ATS Resume vs JD Analyzer | ✅ |
+| 16 | AI Mock Interview System | ✅ |
 
-## ATS Analyzer Features
+## Mock Interview Features
 
-- Dedicated POST /ats-analyze backend endpoint
-- ATSInputModal: paste job description + optional resume upload
-- ATSDashboard: circular score, category bars, keyword analysis, improvements, AI rewrites
-- Keyword chips (found/missing) with color coding
-- Improvement suggestions with priority badges + search
-- AI rewrite cards with one-click copy
-- Auto-detects ATS responses in ChatMessage (falls back to markdown)
-- Available from WelcomeScreen quick actions
-- Reuses existing resume_agent (no new agent needed)
+- InterviewSetupModal: role, experience level, interview type, question count
+- Interview types: HR, Technical, Behavioral (STAR), Mixed
+- Question counts: 3, 5, 8, or 10
+- InterviewProgress: sticky progress bar (Q2/10), remaining time estimate
+- Per-answer scoring prompt (Communication, Technical, Confidence, Problem Solving, Completeness)
+- InterviewFinalDashboard: circular overall score, category bars, strengths/weaknesses, hiring recommendation
+- Auto-detects final report in interview_agent responses
+- Download report, retry interview actions
+- Reuses existing interview_agent + streaming
 
 ## Remaining Milestones
 
