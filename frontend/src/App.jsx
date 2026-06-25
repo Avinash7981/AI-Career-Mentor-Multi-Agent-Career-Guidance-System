@@ -40,6 +40,9 @@ function App() {
   const [input, setInput] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [streaming, setStreaming] = useState(false);
+  const [streamingText, setStreamingText] = useState("");
+  const [streamingAgent, setStreamingAgent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [sessionId, setSessionId] = useState(() => {
@@ -95,7 +98,7 @@ function App() {
 
   const handleSend = async (overrideMessage) => {
     const messageText = overrideMessage || input.trim();
-    if (!messageText) return;
+    if (!messageText || loading) return;
 
     // Create chat if none exists
     let chatId = currentChatId;
@@ -128,29 +131,77 @@ function App() {
     saveChats(updatedChats);
     if (!overrideMessage) setInput("");
     setLoading(true);
+    setStreaming(true);
+    setStreamingText("");
+    setStreamingAgent(null);
 
     try {
-      const response = await axios.post("http://localhost:3001/chat", {
-        message: messageText,
-        sessionId,
+      const response = await fetch("http://localhost:3001/chat/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: messageText, sessionId }),
       });
 
-      const botReply = response.data.reply;
-      const agent = response.data.agent || "orchestrator_agent";
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
 
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let accumulatedText = "";
+      let detectedAgent = "orchestrator_agent";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6);
+          if (!jsonStr) continue;
+
+          try {
+            const event = JSON.parse(jsonStr);
+
+            if (event.type === "agent") {
+              detectedAgent = event.agent;
+              setStreamingAgent(event.agent);
+            } else if (event.type === "text") {
+              accumulatedText += event.content;
+              setStreamingText(accumulatedText);
+            } else if (event.type === "done") {
+              detectedAgent = event.agent || detectedAgent;
+            } else if (event.type === "error") {
+              throw new Error(event.message || "Stream error");
+            }
+          } catch (parseErr) {
+            if (parseErr.message !== "Stream error" && !parseErr.message.startsWith("HTTP")) {
+              continue; // Skip malformed SSE lines
+            }
+            throw parseErr;
+          }
+        }
+      }
+
+      // Finalize: add bot message to chat
       const finalChats = updatedChats.map((chat) => {
         if (chat.id === chatId) {
           return {
             ...chat,
-            messages: [...chat.messages, { type: "bot", text: botReply, agent }],
+            messages: [...chat.messages, { type: "bot", text: accumulatedText, agent: detectedAgent }],
           };
         }
         return chat;
       });
-
       saveChats(finalChats);
+
     } catch (error) {
-      const errorMsg = error.response?.data?.message || error.message || "Connection failed";
+      const errorMsg = error.message || "Connection failed";
       const finalChats = updatedChats.map((chat) => {
         if (chat.id === chatId) {
           return {
@@ -163,6 +214,9 @@ function App() {
       saveChats(finalChats);
     } finally {
       setLoading(false);
+      setStreaming(false);
+      setStreamingText("");
+      setStreamingAgent(null);
     }
   };
 
@@ -338,7 +392,10 @@ function App() {
                   <ChatMessage key={index} msg={msg} />
                 )
               )}
-              {loading && <LoadingIndicator />}
+              {streaming && streamingText && (
+                <ChatMessage msg={{ type: "bot", text: streamingText, agent: streamingAgent, streaming: true }} />
+              )}
+              {loading && !streamingText && <LoadingIndicator />}
               <div ref={messagesEndRef} />
             </div>
           )}

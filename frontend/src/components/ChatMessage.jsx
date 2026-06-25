@@ -19,7 +19,10 @@ export default function ChatMessage({ msg }) {
         {isBot && msg.agent && <AgentBadge agent={msg.agent} />}
         <div className="msg-text">
           {isBot ? (
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+            <>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>
+              {msg.streaming && <span className="streaming-cursor" />}
+            </>
           ) : (
             <p>{msg.text}</p>
           )}

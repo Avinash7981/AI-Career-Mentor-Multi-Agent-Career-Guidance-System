@@ -468,6 +468,145 @@ app.post("/chat", async (req, res) => {
 });
 
 // ============================================================
+// POST /chat/stream - SSE streaming endpoint
+// ============================================================
+app.post("/chat/stream", async (req, res) => {
+    const {
+        message,
+        sessionId: clientSessionId
+    } = req.body;
+
+    if (!message) {
+        return res.status(400).json({
+            error: "Message is required"
+        });
+    }
+
+    const sessionId = clientSessionId || crypto.randomUUID();
+    const userId = "default-user";
+
+    // Set SSE headers
+    res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "X-Accel-Buffering": "no",
+    });
+
+    // Handle client disconnect
+    let closed = false;
+    req.on("close", () => {
+        closed = true;
+    });
+
+    try {
+        await ensureAdkSession(userId, sessionId);
+
+        // Inject session context
+        const state = sessionManager.getState(sessionId);
+        let enrichedMessage = message;
+        if (state.resumeText || state.skills.length > 0) {
+            const contextBlock = buildContextBlock(state);
+            enrichedMessage = contextBlock + "\n\nUser message: " + message;
+        }
+
+        const newMessage = {
+            role: "user",
+            parts: [{
+                text: enrichedMessage
+            }]
+        };
+
+        let routedAgent = "orchestrator_agent";
+        let fullText = "";
+        let sentAgent = false;
+
+        for await (const event of runner.runAsync({
+            userId,
+            sessionId,
+            newMessage
+        })) {
+            if (closed) break;
+
+            if (!event.content || !event.content.parts) continue;
+
+            for (const part of event.content.parts) {
+                if (closed) break;
+
+                // Track routing
+                if (part.functionCall) {
+                    routedAgent = part.functionCall.name;
+                    // Send agent info as soon as we know which specialist is handling it
+                    if (!sentAgent) {
+                        res.write(`data: ${JSON.stringify({ type: "agent", agent: routedAgent })}\n\n`);
+                        sentAgent = true;
+                    }
+                }
+
+                // Extract text from functionResponse (specialist agent output)
+                if (part.functionResponse) {
+                    const resp = part.functionResponse.response;
+                    let text = null;
+                    if (typeof resp === "string") text = resp;
+                    else if (resp && resp.output) text = resp.output;
+                    else if (resp && resp.result) text = typeof resp.result === "string" ? resp.result : JSON.stringify(resp.result);
+                    else if (resp && resp.text) text = resp.text;
+                    else if (resp) text = JSON.stringify(resp);
+
+                    if (text) {
+                        fullText += text;
+                        // Stream the text in chunks for progressive rendering
+                        const chunks = text.match(/.{1,80}/gs) || [text];
+                        for (const chunk of chunks) {
+                            if (closed) break;
+                            res.write(`data: ${JSON.stringify({ type: "text", content: chunk })}\n\n`);
+                        }
+                    }
+                }
+
+                // Direct text from orchestrator's final response
+                if (part.text && !part.thought) {
+                    fullText += part.text;
+                    const chunks = part.text.match(/.{1,80}/gs) || [part.text];
+                    for (const chunk of chunks) {
+                        if (closed) break;
+                        res.write(`data: ${JSON.stringify({ type: "text", content: chunk })}\n\n`);
+                    }
+                }
+            }
+        }
+
+        // If we never identified a specialist, send orchestrator as agent
+        if (!sentAgent) {
+            res.write(`data: ${JSON.stringify({ type: "agent", agent: routedAgent })}\n\n`);
+        }
+
+        // Update session state from full response
+        const agent = routedAgent !== "orchestrator_agent" ? routedAgent : "orchestrator_agent";
+        if (fullText) {
+            updateSessionFromResponse(sessionId, agent, fullText);
+        }
+
+        // Send done event
+        res.write(`data: ${JSON.stringify({ type: "done", sessionId, agent })}\n\n`);
+        res.end();
+
+    } catch (error) {
+        console.error("[STREAM ERROR]", error.message || error);
+        const quotaMsg = getQuotaErrorMessage(error);
+        const errorPayload = {
+            type: "error",
+            errorType: quotaMsg ? "QUOTA_EXCEEDED" : "PROCESSING_FAILED",
+            message: quotaMsg || "Something went wrong. Please try again.",
+        };
+        if (!closed) {
+            res.write(`data: ${JSON.stringify(errorPayload)}\n\n`);
+            res.end();
+        }
+    }
+});
+
+// ============================================================
 // POST /upload-resume - Resume upload, parsed then sent to agents
 // ============================================================
 app.post("/upload-resume", upload.single("resume"), async (req, res) => {

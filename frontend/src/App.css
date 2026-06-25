@@ -838,3 +838,32 @@ body {
 .attach-btn {
     transition: all 0.15s ease;
 }
+
+
+/* ========================================
+   Streaming Cursor
+   ======================================== */
+
+.streaming-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: #a1a1aa;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: cursorBlink 1s steps(2) infinite;
+}
+
+@keyframes cursorBlink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
