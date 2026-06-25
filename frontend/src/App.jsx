@@ -19,6 +19,7 @@ import AgentBadge from "./components/AgentBadge";
 import WelcomeScreen from "./components/WelcomeScreen";
 import FileAttachment from "./components/FileAttachment";
 import ErrorMessage from "./components/ErrorMessage";
+import ATSInputModal from "./components/ats/ATSInputModal";
 
 function generateId() {
   return crypto.randomUUID();
@@ -56,6 +57,7 @@ function App() {
   const [showSearch, setShowSearch] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
+  const [showATSModal, setShowATSModal] = useState(false);
   const [sessionId, setSessionId] = useState(() => {
     let stored = localStorage.getItem("sessionId");
     if (!stored) {
@@ -285,6 +287,61 @@ function App() {
     }
   };
 
+  const handleATSSubmit = async ({ jobDescription, resumeFile }) => {
+    setLoading(true);
+    let chatId = currentChatId;
+    let updatedChats = [...chats];
+    if (!chatId) {
+      const newChat = { id: generateId(), title: "ATS Analysis", messages: [] };
+      updatedChats = [newChat, ...updatedChats];
+      chatId = newChat.id;
+      setCurrentChatId(chatId);
+    }
+    // Add user message
+    updatedChats = updatedChats.map((chat) => {
+      if (chat.id === chatId) {
+        return { ...chat,
+          title: chat.messages.length === 0 ? "ATS Job Match" : chat.title,
+          messages: [...chat.messages, { type: "user", text: "Analyze my resume against this job description for ATS compatibility.", timestamp: getTimestamp() }],
+        };
+      }
+      return chat;
+    });
+    saveChats(updatedChats);
+
+    try {
+      const formData = new FormData();
+      formData.append("jobDescription", jobDescription);
+      formData.append("sessionId", sessionId);
+      if (resumeFile) formData.append("resume", resumeFile);
+
+      const response = await axios.post("http://localhost:3001/ats-analyze", formData);
+      const analysis = response.data.analysis;
+      const agent = response.data.agent || "resume_agent";
+
+      const finalChats = updatedChats.map((chat) => {
+        if (chat.id === chatId) {
+          return { ...chat, messages: [...chat.messages, {
+            type: "bot", text: analysis, agent, atsAnalysis: true, timestamp: getTimestamp(),
+          }] };
+        }
+        return chat;
+      });
+      saveChats(finalChats);
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "ATS analysis failed";
+      const finalChats = updatedChats.map((chat) => {
+        if (chat.id === chatId) {
+          return { ...chat, messages: [...chat.messages, { type: "error", text: errorMsg }] };
+        }
+        return chat;
+      });
+      saveChats(finalChats);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleFileUpload = async (file) => {
     if (!file || file.type !== "application/pdf") return;
     setSelectedFile(file);
@@ -408,7 +465,10 @@ function App() {
           )}
 
           {isEmptyChat ? (
-            <WelcomeScreen onSelectAction={(prompt) => handleSend(prompt)} />
+            <WelcomeScreen onSelectAction={(prompt) => {
+              if (prompt === "__ATS_ANALYZE__") { setShowATSModal(true); return; }
+              handleSend(prompt);
+            }} />
           ) : (
             <div className="messages-list">
               {currentChat.messages.map((msg, index) =>
@@ -486,8 +546,23 @@ function App() {
           </div>
         </div>
       </main>
+
+      {/* ATS Modal */}
+      {showATSModal && (
+        <ATSInputModal
+          onSubmit={handleATSSubmit}
+          onClose={() => setShowATSModal(false)}
+          hasResume={!!sessionManager_getResumeFromStorage()}
+        />
+      )}
     </div>
   );
+}
+
+function sessionManager_getResumeFromStorage() {
+  // Check if we have a resume in the current session by looking at chat history
+  const chats = JSON.parse(localStorage.getItem("careerChats") || "[]");
+  return chats.some(c => c.messages && c.messages.some(m => m.agent === "resume_agent"));
 }
 
 export default App;

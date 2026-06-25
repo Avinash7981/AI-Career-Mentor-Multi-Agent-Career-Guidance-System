@@ -1612,3 +1612,340 @@ details[open] .rd-raw-toggle::before {
     outline: 2px solid #3b82f6;
     outline-offset: 2px;
 }
+
+
+/* ========================================
+   ATS Input Modal
+   ======================================== */
+
+.ats-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    animation: fadeIn 0.15s ease;
+}
+
+.ats-modal {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 560px;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: msgSlideIn 0.2s ease;
+}
+
+.ats-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #1e1e1e;
+}
+
+.ats-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #f4f4f5;
+    font-weight: 600;
+}
+
+.ats-modal-title h3 {
+    font-size: 15px;
+    margin: 0;
+}
+
+.ats-modal-close {
+    border: none;
+    background: transparent;
+    color: #71717a;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.ats-modal-close:hover {
+    color: #e4e4e7;
+}
+
+.ats-modal-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ats-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ats-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #a1a1aa;
+}
+
+.ats-file-input input[type="file"] {
+    display: none;
+}
+
+.ats-file-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px dashed #2a2a2a;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #71717a;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ats-file-label:hover {
+    border-color: #3b82f6;
+    color: #a1a1aa;
+}
+
+.ats-resume-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 6px;
+    font-size: 12px;
+    color: #4ade80;
+}
+
+.ats-jd-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    background: #0f0f0f;
+    color: #e4e4e7;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.ats-jd-input:focus {
+    border-color: #3b82f6;
+}
+
+.ats-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px 20px;
+    border-top: 1px solid #1e1e1e;
+}
+
+.ats-cancel-btn {
+    padding: 8px 14px;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    background: transparent;
+    color: #a1a1aa;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ats-cancel-btn:hover {
+    background: #1e1e1e;
+}
+
+.ats-submit-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #3b82f6;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ats-submit-btn:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.ats-submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   ATS Dashboard Enhancements
+   ======================================== */
+
+.ats-score-label {
+    text-align: center;
+    font-size: 11px;
+    color: #71717a;
+    margin-top: -8px;
+}
+
+.ats-keywords-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ats-kw-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ats-kw-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.ats-kw-label-found {
+    color: #4ade80;
+}
+
+.ats-kw-label-missing {
+    color: #f87171;
+}
+
+.ats-kw-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.ats-keyword-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.ats-kw-found {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.ats-kw-missing {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.ats-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: #0f0f0f;
+    border: 1px solid #1e1e1e;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    color: #71717a;
+}
+
+.ats-search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #e4e4e7;
+    font-size: 12px;
+    outline: none;
+}
+
+.ats-rewrites {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ats-rewrite-card {
+    border: 1px solid #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ats-rewrite-current {
+    padding: 10px 12px;
+    background: rgba(239, 68, 68, 0.05);
+    border-bottom: 1px solid #1e1e1e;
+}
+
+.ats-rewrite-improved {
+    padding: 10px 12px;
+    background: rgba(34, 197, 94, 0.05);
+    position: relative;
+}
+
+.ats-rw-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.ats-rewrite-current .ats-rw-label {
+    color: #f87171;
+}
+
+.ats-rewrite-improved .ats-rw-label {
+    color: #4ade80;
+}
+
+.ats-rewrite-card p {
+    font-size: 12px;
+    color: #e4e4e7;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.ats-rw-copy {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 6px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #71717a;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ats-rw-copy:hover {
+    color: #e4e4e7;
+    background: #1e1e1e;
+}

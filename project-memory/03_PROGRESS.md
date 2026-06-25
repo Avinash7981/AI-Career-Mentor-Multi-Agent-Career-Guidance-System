@@ -1,37 +1,31 @@
 # 03 - Progress
 
-## Completion: 100% (Full Production UX)
+## Completion: 100% (Full Feature Set)
 
 ## Completed Tasks
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Directory structure + @google/adk | ✅ |
-| 2 | Specialist agents + FunctionTools | ✅ |
-| 3 | Orchestrator + AgentTool wiring | ✅ |
-| 4 | Server.js refactor with ADK Runner | ✅ |
-| 5 | Backend checkpoint | ✅ |
-| 6 | Frontend agent awareness | ✅ |
-| 7 | Inter-agent context sharing | ✅ |
-| 8 | Final E2E verification | ✅ |
+| 1-8 | Multi-agent system (backend) | ✅ |
 | 9 | Frontend UI overhaul | ✅ |
 | 10 | Streaming responses (SSE) | ✅ |
 | 11 | Professional markdown rendering | ✅ |
 | 12 | Resume Dashboard | ✅ |
 | 13 | Multi-agent orchestration | ✅ |
 | 14 | Production UX upgrade | ✅ |
+| 15 | ATS Resume vs Job Description Analyzer | ✅ |
 
-## Production UX Features
+## ATS Analyzer Features
 
-- Message actions (Copy, Regenerate, Like, Dislike, Download) on hover
-- Stop Generating button with AbortController (saves partial text)
-- Message timestamps (hover to see full date)
-- Smart auto-scroll (doesn't force if user scrolled up)
-- "New Response" scroll-to-bottom button
-- Smooth message animations (slide in)
-- Mobile responsive (sidebar collapse, hamburger menu, overlay)
-- Accessibility (ARIA labels, visible focus states, keyboard navigation)
-- Regenerate response functionality
+- Dedicated POST /ats-analyze backend endpoint
+- ATSInputModal: paste job description + optional resume upload
+- ATSDashboard: circular score, category bars, keyword analysis, improvements, AI rewrites
+- Keyword chips (found/missing) with color coding
+- Improvement suggestions with priority badges + search
+- AI rewrite cards with one-click copy
+- Auto-detects ATS responses in ChatMessage (falls back to markdown)
+- Available from WelcomeScreen quick actions
+- Reuses existing resume_agent (no new agent needed)
 
 ## Remaining Milestones
 

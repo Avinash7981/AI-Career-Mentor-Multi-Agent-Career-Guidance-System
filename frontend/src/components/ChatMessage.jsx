@@ -4,6 +4,8 @@ import MarkdownRenderer from "./MarkdownRenderer";
 import MessageActions from "./MessageActions";
 import ResumeDashboard from "./resume/ResumeDashboard";
 import { parseResumeResponse } from "./resume/parseResumeResponse";
+import ATSDashboard from "./ats/ATSDashboard";
+import { parseATSResponse } from "./ats/parseATSResponse";
 import { User } from "lucide-react";
 
 function formatTime(timestamp) {
@@ -24,8 +26,20 @@ export default function ChatMessage({ msg, onRegenerate }) {
   const resumeData = useMemo(() => {
     if (!isBot || msg.agent !== "resume_agent" || msg.streaming) return null;
     if (msg.agents && msg.agents.length > 1) return null;
+    // Check if this is an ATS analysis (contains "Keywords Found" or "ATS Match")
+    if (msg.text && /(?:missing\s*keywords|keywords?\s*found|ats\s*match\s*score)/i.test(msg.text)) return null;
     return parseResumeResponse(msg.text);
   }, [isBot, msg.agent, msg.agents, msg.text, msg.streaming]);
+
+  const atsData = useMemo(() => {
+    if (!isBot || msg.streaming) return null;
+    if (msg.atsAnalysis) return parseATSResponse(msg.text); // Explicit flag
+    // Auto-detect ATS analysis by content pattern
+    if (msg.agent === "resume_agent" && msg.text && /(?:missing\s*keywords|keywords?\s*found|ats\s*match\s*score)/i.test(msg.text)) {
+      return parseATSResponse(msg.text);
+    }
+    return null;
+  }, [isBot, msg.agent, msg.text, msg.streaming, msg.atsAnalysis]);
 
   return (
     <div className={`chat-msg ${msg.type} msg-animate`}>
@@ -47,7 +61,9 @@ export default function ChatMessage({ msg, onRegenerate }) {
         <div className="msg-text">
           {isBot ? (
             <>
-              {resumeData ? (
+              {atsData ? (
+                <ATSDashboard data={atsData} />
+              ) : resumeData ? (
                 <ResumeDashboard data={resumeData} />
               ) : (
                 <MarkdownRenderer content={msg.text || ""} />

@@ -1,4 +1,4 @@
-import { FileText, Briefcase, GraduationCap, BarChart3 } from "lucide-react";
+import { FileText, Briefcase, GraduationCap, BarChart3, Target } from "lucide-react";
 
 const quickActions = [
   {
@@ -7,6 +7,13 @@ const quickActions = [
     description: "Get expert feedback on your resume",
     prompt: "I'd like a comprehensive resume review. Analyze my resume for ATS optimization, formatting, and content improvements.",
     color: "#3b82f6",
+  },
+  {
+    icon: Target,
+    title: "ATS Job Match",
+    description: "Compare your resume against a job description",
+    prompt: "__ATS_ANALYZE__",
+    color: "#ef4444",
   },
   {
     icon: Briefcase,

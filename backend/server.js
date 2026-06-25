@@ -809,6 +809,133 @@ function buildContextBlock(state) {
 }
 
 // ============================================================
+// POST /ats-analyze - ATS Resume vs Job Description analysis
+// ============================================================
+app.post("/ats-analyze", upload.single("resume"), async (req, res) => {
+    try {
+        const {
+            jobDescription,
+            sessionId: clientSessionId
+        } = req.body;
+        let resumeText = req.body.resumeText || null;
+        const sessionId = clientSessionId || crypto.randomUUID();
+        const userId = "default-user";
+
+        // If a file was uploaded, parse it
+        if (req.file) {
+            const dataBuffer = fs.readFileSync(req.file.path);
+            const pdfData = await pdfParse(dataBuffer);
+            resumeText = pdfData.text;
+            fs.unlinkSync(req.file.path);
+        }
+
+        // If no resume text, check session state
+        if (!resumeText) {
+            const state = sessionManager.getState(sessionId);
+            resumeText = state.resumeText;
+        }
+
+        if (!resumeText) {
+            return res.status(400).json({
+                error: "Resume text is required. Upload a resume first."
+            });
+        }
+
+        if (!jobDescription) {
+            return res.status(400).json({
+                error: "Job description is required."
+            });
+        }
+
+        // Store resume in session
+        sessionManager.updateState(sessionId, {
+            resumeText
+        });
+
+        // Build ATS analysis prompt
+        const atsPrompt = `Perform a detailed ATS (Applicant Tracking System) analysis comparing this resume against the job description.
+
+You MUST respond with EXACTLY this structured format:
+
+## ATS Match Score
+Overall ATS Score: [NUMBER]/100
+
+### Category Scores
+- ATS Compatibility: [NUMBER]/100
+- Skills Match: [NUMBER]/100
+- Experience Match: [NUMBER]/100
+- Education Match: [NUMBER]/100
+- Projects Match: [NUMBER]/100
+
+## Keywords Analysis
+
+### Keywords Found
+- [list matching keywords from JD found in resume]
+
+### Missing Keywords
+- [list important keywords from JD NOT found in resume]
+
+### Technical Skills Match
+- [list matched technical skills]
+
+### Missing Technical Skills
+- [list missing technical skills from JD]
+
+## Strengths
+- [list what the resume does well for this role]
+
+## Weaknesses
+- [list gaps between resume and job requirements]
+
+## Improvement Suggestions
+
+### High Priority
+1. [most impactful change]
+2. [second most impactful]
+
+### Medium Priority
+1. [medium impact suggestion]
+
+### Low Priority
+1. [nice-to-have improvement]
+
+## Missing Sections
+- [list any important sections the resume lacks for this role]
+
+## AI Rewrite Suggestions
+For each weak bullet point, provide:
+**Current:** [original text]
+**Improved:** [rewritten version optimized for this JD]
+
+---
+
+Resume:
+${resumeText}
+
+---
+
+Job Description:
+${jobDescription}`;
+
+        const {
+            reply,
+            agent
+        } = await runAgent(userId, sessionId, atsPrompt);
+
+        res.json({
+            analysis: reply,
+            agent,
+            sessionId,
+            type: "ats_analysis",
+        });
+    } catch (error) {
+        console.error("ATS analysis error:", error.message || error);
+        const errResp = buildErrorResponse(error, "resume_agent");
+        res.status(errResp.statusCode).json(errResp.body);
+    }
+});
+
+// ============================================================
 // Server startup
 // ============================================================
 app.listen(process.env.PORT, () => {
