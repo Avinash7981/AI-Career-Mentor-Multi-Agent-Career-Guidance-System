@@ -36,6 +36,79 @@ const runner = new Runner({
 });
 
 /**
+ * Helper: Detect if an error is a Gemini API quota/rate-limit error.
+ * Returns a user-friendly message if it is, or null if it's not a quota issue.
+ */
+function getQuotaErrorMessage(error) {
+    const msg = error.message || "";
+    const status = error.status || error.statusCode || error.code || "";
+
+    // Check for 429 status code
+    if (status === 429 || status === "429") {
+        return "⚠️ AI service quota exceeded. Please try again later or switch to a different model.";
+    }
+
+    // Check for quota-related keywords in error message
+    const quotaPatterns = [
+        /429/i,
+        /quota/i,
+        /rate.?limit/i,
+        /resource.?exhausted/i,
+        /too many requests/i,
+        /RESOURCE_EXHAUSTED/i,
+    ];
+
+    for (const pattern of quotaPatterns) {
+        if (pattern.test(msg) || pattern.test(String(status))) {
+            return "⚠️ AI service quota exceeded. Please try again later or switch to a different model.";
+        }
+    }
+
+    // Check nested error structures (Google API errors)
+    if (error.errorDetails) {
+        const details = JSON.stringify(error.errorDetails);
+        if (/quota|rate.?limit|RESOURCE_EXHAUSTED/i.test(details)) {
+            return "⚠️ AI service quota exceeded. Please try again later or switch to a different model.";
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Helper: Build structured error response, detecting quota errors specifically.
+ */
+function buildErrorResponse(error, defaultAgent) {
+    const quotaMsg = getQuotaErrorMessage(error);
+
+    if (quotaMsg) {
+        console.error("[QUOTA ERROR]", error.message || error);
+        return {
+            statusCode: 429,
+            body: {
+                error: true,
+                agent: defaultAgent,
+                errorType: "QUOTA_EXCEEDED",
+                message: quotaMsg,
+                fallback: true,
+            }
+        };
+    }
+
+    console.error("[ERROR]", error.message || error);
+    return {
+        statusCode: 500,
+        body: {
+            error: true,
+            agent: defaultAgent,
+            errorType: "PROCESSING_FAILED",
+            message: "Something went wrong. Please try again.",
+            fallback: true,
+        }
+    };
+}
+
+/**
  * Helper: Ensure an ADK session exists for the given userId + sessionId.
  * Creates one if it doesn't exist, seeding it with our sessionManager state.
  */
@@ -388,14 +461,9 @@ app.post("/chat", async (req, res) => {
             sessionId
         });
     } catch (error) {
-        console.error("Agent Error:", error);
-        res.status(500).json({
-            error: true,
-            agent: "orchestrator_agent",
-            errorType: "PROCESSING_FAILED",
-            message: "Something went wrong. Please try again.",
-            fallback: true,
-        });
+        console.error("Agent Error:", error.message || error);
+        const errResp = buildErrorResponse(error, "orchestrator_agent");
+        res.status(errResp.statusCode).json(errResp.body);
     }
 });
 
@@ -447,14 +515,9 @@ app.post("/upload-resume", upload.single("resume"), async (req, res) => {
             sessionId
         });
     } catch (error) {
-        console.error("Resume upload error:", error);
-        res.status(500).json({
-            error: true,
-            agent: "resume_agent",
-            errorType: "ANALYSIS_FAILED",
-            message: "Resume analysis failed. Please try uploading again.",
-            fallback: true,
-        });
+        console.error("Resume upload error:", error.message || error);
+        const errResp = buildErrorResponse(error, "resume_agent");
+        res.status(errResp.statusCode).json(errResp.body);
     }
 });
 
@@ -501,10 +564,9 @@ app.post("/analyze-resume", upload.single("resume"), async (req, res) => {
             sessionId
         });
     } catch (error) {
-        console.error("Resume analysis error:", error);
-        res.status(500).json({
-            error: "Resume analysis failed"
-        });
+        console.error("Resume analysis error:", error.message || error);
+        const errResp = buildErrorResponse(error, "resume_agent");
+        res.status(errResp.statusCode).json(errResp.body);
     }
 });
 
@@ -546,10 +608,9 @@ app.post("/career-plan", async (req, res) => {
             sessionId
         });
     } catch (error) {
-        console.error("Career plan error:", error);
-        res.status(500).json({
-            error: "Career plan generation failed"
-        });
+        console.error("Career plan error:", error.message || error);
+        const errResp = buildErrorResponse(error, "career_agent");
+        res.status(errResp.statusCode).json(errResp.body);
     }
 });
 
