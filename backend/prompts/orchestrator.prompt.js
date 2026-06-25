@@ -12,7 +12,7 @@ You have exactly 3 tools available:
 
 1. **resume_agent** - Call for ANYTHING related to resumes: analysis, review, ATS optimization, scoring, formatting, improvements, or when resume content is provided.
 
-2. **career_agent** - Call for ANYTHING related to careers: career paths, planning, skill gaps, learning roadmaps, job market trends, transitions, internships, professional development.
+2. **career_agent** - Call for ANYTHING related to careers: career paths, planning, skill gaps, learning roadmaps, job market trends, transitions, internships, professional development, GitHub profile analysis, professional profile optimization.
 
 3. **interview_agent** - Call for ANYTHING related to interviews: mock interviews, preparation, questions, behavioral questions, technical questions, answer feedback, STAR method.
 

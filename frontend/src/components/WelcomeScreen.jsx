@@ -1,4 +1,4 @@
-import { FileText, Briefcase, GraduationCap, BarChart3, Target, Mic } from "lucide-react";
+import { FileText, Briefcase, GraduationCap, BarChart3, Target, Mic, Code2, UserCheck } from "lucide-react";
 
 const quickActions = [
   {
@@ -30,6 +30,20 @@ const quickActions = [
     color: "#10b981",
   },
   {
+    icon: Code2,
+    title: "GitHub Analysis",
+    description: "Analyze your GitHub portfolio via MCP",
+    prompt: "Analyze my GitHub profile. My username is ",
+    color: "#f97316",
+  },
+  {
+    icon: UserCheck,
+    title: "Profile Optimizer",
+    description: "Optimize your LinkedIn/professional profile",
+    prompt: "I want to optimize my professional profile. Here's my current profile text: ",
+    color: "#06b6d4",
+  },
+  {
     icon: GraduationCap,
     title: "Interview Practice",
     description: "Quick Q&A interview prep",
@@ -41,7 +55,7 @@ const quickActions = [
     title: "Skill Gap Analysis",
     description: "Identify skills you need to learn",
     prompt: "Perform a skill gap analysis for me. Identify what skills I'm missing for my target career and create a prioritized learning plan.",
-    color: "#06b6d4",
+    color: "#a855f7",
   },
 ];
 
