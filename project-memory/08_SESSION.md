@@ -2,43 +2,32 @@
 
 ## Latest Session
 
-**Date:** 2025-06-25 (session 11 - Auth + Workspace)
+**Date:** 2025-06-25 (session 12 - Chat History)
 
 **Work Completed:**
-1. Installed firebase + react-router-dom
-2. Firebase config with env vars (placeholder)
-3. AuthContext: Google login, email/password, register, logout, persistent session
-4. LoginPage: professional UI with Google + email form
-5. ProtectedRoute: redirects to /login if unauthenticated
-6. Dashboard page: stats cards, recent chats, quick actions
-7. Settings page: profile, theme, features toggle, export, delete account
-8. Updated main.jsx with BrowserRouter + Routes
-9. Updated App.jsx: user-scoped localStorage, sidebar nav (Dashboard/Settings/Logout)
-10. Full CSS for login, dashboard, settings, sidebar footer
-
-**Files Created:**
-- frontend/src/firebase.js
-- frontend/src/contexts/AuthContext.jsx
-- frontend/src/components/auth/LoginPage.jsx
-- frontend/src/components/auth/ProtectedRoute.jsx
-- frontend/src/pages/Dashboard.jsx
-- frontend/src/pages/Settings.jsx
+1. Enhanced chat object: createdAt, updatedAt, pinned, agents[] fields
+2. Rename chat: inline edit with Enter/blur to save
+3. Pin chat: toggle pin, pinned chats sorted to top with blue indicator
+4. Participating agents tracked per conversation on each response
+5. updatedAt refreshed on each new bot message
+6. Sidebar chat items: 3-action buttons (rename, pin, delete) on hover
+7. Sorted by pinned-first then insertion order
+8. All features scoped per Firebase UID
 
 **Files Modified:**
-- frontend/src/main.jsx (router + auth provider)
-- frontend/src/App.jsx (user-scoped storage, nav buttons, useAuth)
-- frontend/src/App.css (login, dashboard, settings, sidebar footer)
-- frontend/package.json (firebase, react-router-dom)
+- frontend/src/App.jsx (renameChat, togglePinChat, renamingChatId state, enhanced chat object, agent tracking, sidebar actions)
+- frontend/src/App.css (chat-item-actions, chat-action-sm, pinned indicator, rename input)
 
 **Current Blockers:**
-- Need actual Firebase project config to test auth
+- None — build passes, lint clean
 
 **Next Task:**
-- Add Firebase config values
+- Add Firebase config
 - Deploy
 
 ## Previous Sessions
 
+**Session 11:** Firebase Auth + Dashboard + Settings
 **Session 10:** Career Roadmap
 **Session 9:** Mock Interview
 **Session 8:** ATS Analyzer

@@ -2908,3 +2908,63 @@ details[open] .rd-raw-toggle::before {
 .sidebar-logout:hover {
     background: rgba(239, 68, 68, 0.1);
 }
+
+
+/* ========================================
+   Chat Item Actions (pin, rename, delete)
+   ======================================== */
+
+.chat-item-actions {
+    display: none;
+    align-items: center;
+    gap: 1px;
+    margin-left: auto;
+}
+
+.chat-item:hover .chat-item-actions {
+    display: flex;
+}
+
+.chat-action-sm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #52525b;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.chat-action-sm:hover {
+    background: #2a2a2a;
+    color: #a1a1aa;
+}
+
+.chat-action-sm.chat-delete:hover {
+    color: #ef4444;
+}
+
+.chat-item.pinned {
+    border-left: 2px solid #3b82f6;
+}
+
+.chat-pin-icon {
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+.chat-rename-input {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid #3b82f6;
+    border-radius: 4px;
+    background: #0f0f0f;
+    color: #e4e4e7;
+    font-size: 12px;
+    padding: 2px 6px;
+    outline: none;
+}

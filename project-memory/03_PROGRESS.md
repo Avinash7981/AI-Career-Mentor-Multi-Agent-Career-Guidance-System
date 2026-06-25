@@ -17,21 +17,24 @@
 | 16 | AI Mock Interview System | ✅ |
 | 17 | AI Career Roadmap Generator | ✅ |
 | 18 | Firebase Auth + Dashboard + Settings | ✅ |
+| 19 | Authenticated Chat History | ✅ |
 
-## Authentication & Workspace
+## Authenticated Chat History
 
-- Firebase Auth: Google login + email/password + persistent session
-- Protected routes (react-router-dom)
-- Login page with professional UI
-- Dashboard: stats cards, recent chats, quick actions
-- Settings: profile, theme, features, export data, delete account
 - Per-user localStorage scoping (careerChats_{uid})
-- Sidebar: Dashboard, Settings, Sign Out navigation
-- AuthContext with useAuth hook
+- Chat object stores: title, createdAt, updatedAt, messages, pinned, agents[]
+- Auto-generated titles from first user message
+- Rename chat (inline edit in sidebar)
+- Delete chat
+- Pin chat (sorted to top, blue left border indicator)
+- Search chats by title
+- Participating agents tracked per conversation
+- updatedAt refreshed on every new message
+- Persists across page refreshes
 
 ## Remaining Milestones
 
-- [ ] Add Firebase config (apiKey, authDomain, projectId)
+- [ ] Add Firebase config
 - [ ] Live test with Gemini API key
 - [ ] Deploy (Render + Vercel)
 - [ ] Hackathon README

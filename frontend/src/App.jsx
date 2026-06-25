@@ -18,6 +18,8 @@ import {
   LayoutDashboard,
   Settings,
   LogOut,
+  Pin,
+  Edit3,
 } from "lucide-react";
 import ChatMessage from "./components/ChatMessage";
 import AgentBadge from "./components/AgentBadge";
@@ -68,6 +70,8 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [renamingChatId, setRenamingChatId] = useState(null);
+  const [renameValue, setRenameValue] = useState("");
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [showATSModal, setShowATSModal] = useState(false);
   const [showInterviewModal, setShowInterviewModal] = useState(false);
@@ -119,7 +123,8 @@ function App() {
     const newSessionId = crypto.randomUUID();
     localStorage.setItem("sessionId", newSessionId);
     setSessionId(newSessionId);
-    const newChat = { id: generateId(), title: "New Chat", messages: [] };
+    const now = getTimestamp();
+    const newChat = { id: generateId(), title: "New Chat", messages: [], createdAt: now, updatedAt: now, pinned: false, agents: [] };
     const updatedChats = [newChat, ...chats];
     saveChats(updatedChats);
     setCurrentChatId(newChat.id);
@@ -134,6 +139,20 @@ function App() {
     }
   };
 
+  const renameChat = (chatId, newTitle) => {
+    const updatedChats = chats.map((c) =>
+      c.id === chatId ? { ...c, title: newTitle, updatedAt: getTimestamp() } : c
+    );
+    saveChats(updatedChats);
+  };
+
+  const togglePinChat = (chatId) => {
+    const updatedChats = chats.map((c) =>
+      c.id === chatId ? { ...c, pinned: !c.pinned, updatedAt: getTimestamp() } : c
+    );
+    saveChats(updatedChats);
+  };
+
   const stopGenerating = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -141,9 +160,10 @@ function App() {
   };
 
   const currentChat = chats.find((chat) => chat.id === currentChatId);
-  const filteredChats = searchQuery
+  const filteredChats = (searchQuery
     ? chats.filter((c) => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
-    : chats;
+    : chats
+  ).sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 
   const handleSend = async (overrideMessage) => {
     const messageText = overrideMessage || input.trim();
@@ -242,7 +262,8 @@ function App() {
 
       const finalChats = updatedChats.map((chat) => {
         if (chat.id === chatId) {
-          return { ...chat, messages: [...chat.messages, {
+          const newAgents = [...new Set([...(chat.agents || []), detectedAgent, ...allAgents])];
+          return { ...chat, updatedAt: getTimestamp(), agents: newAgents, messages: [...chat.messages, {
             type: "bot", text: accumulatedText, agent: detectedAgent,
             agents: allAgents.length > 1 ? allAgents : undefined, timestamp: getTimestamp(),
           }] };
@@ -518,12 +539,27 @@ Please provide a structured roadmap with these EXACT sections:
 
         <nav className="chat-list">
           {filteredChats.map((chat) => (
-            <div key={chat.id} className={`chat-item ${chat.id === currentChatId ? "active" : ""}`}
+            <div key={chat.id} className={`chat-item ${chat.id === currentChatId ? "active" : ""} ${chat.pinned ? "pinned" : ""}`}
               onClick={() => { setCurrentChatId(chat.id); setShowSidebar(false); }}>
+              {chat.pinned && <Pin size={10} className="chat-pin-icon" />}
               <MessageSquare size={14} />
-              <span className="chat-item-title">{chat.title}</span>
-              <button className="chat-delete" onClick={(e) => { e.stopPropagation(); deleteChat(chat.id); }}
-                aria-label="Delete chat"><Trash2 size={12} /></button>
+              {renamingChatId === chat.id ? (
+                <input className="chat-rename-input" value={renameValue}
+                  onChange={(e) => setRenameValue(e.target.value)}
+                  onBlur={() => { renameChat(chat.id, renameValue || chat.title); setRenamingChatId(null); }}
+                  onKeyDown={(e) => { if (e.key === "Enter") { renameChat(chat.id, renameValue || chat.title); setRenamingChatId(null); } }}
+                  autoFocus onClick={(e) => e.stopPropagation()} />
+              ) : (
+                <span className="chat-item-title">{chat.title}</span>
+              )}
+              <div className="chat-item-actions">
+                <button className="chat-action-sm" onClick={(e) => { e.stopPropagation(); setRenamingChatId(chat.id); setRenameValue(chat.title); }}
+                  aria-label="Rename"><Edit3 size={11} /></button>
+                <button className="chat-action-sm" onClick={(e) => { e.stopPropagation(); togglePinChat(chat.id); }}
+                  aria-label="Pin"><Pin size={11} /></button>
+                <button className="chat-action-sm chat-delete" onClick={(e) => { e.stopPropagation(); deleteChat(chat.id); }}
+                  aria-label="Delete"><Trash2 size={11} /></button>
+              </div>
             </div>
           ))}
         </nav>
