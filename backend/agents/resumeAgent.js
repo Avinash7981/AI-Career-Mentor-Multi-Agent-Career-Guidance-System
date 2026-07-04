@@ -15,7 +15,7 @@ const {
 
 const resumeAgent = new LlmAgent({
     name: "resume_agent",
-    model: "gemini-2.5-flash",
+    model: "gemini-3.1-flash-lite",
     description: "Specialist in resume analysis, ATS optimization, scoring, and improvement " +
         "suggestions. Route here for any questions about resume content, formatting, " +
         "resume scoring, ATS keywords, or when a resume has been uploaded for review.",

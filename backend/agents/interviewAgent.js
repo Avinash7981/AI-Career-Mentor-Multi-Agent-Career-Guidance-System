@@ -15,7 +15,7 @@ const {
 
 const interviewAgent = new LlmAgent({
     name: "interview_agent",
-    model: "gemini-2.5-flash",
+    model: "gemini-3.1-flash-lite",
     description: "Specialist in mock interviews, interview preparation, behavioral and " +
         "technical question generation, and answer feedback. Route here for " +
         "questions about interview prep, mock interviews, STAR method, " +

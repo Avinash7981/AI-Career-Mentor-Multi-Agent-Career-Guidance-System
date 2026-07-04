@@ -28,13 +28,13 @@ const mcpToolset = new MCPToolset({
 
 const careerAgent = new LlmAgent({
     name: "career_agent",
-    model: "gemini-2.5-flash",
+    model: "gemini-3.1-flash-lite",
     description: "Specialist in career path planning, skill gap analysis, learning roadmaps, " +
         "job market insights, GitHub portfolio analysis, and professional profile optimization. " +
         "Route here for questions about career paths, skill gaps, learning plans, job market trends, " +
         "career transitions, internship recommendations, GitHub profile review, or profile optimization.",
     instruction: careerPrompt,
-    tools: [generateRoadmapTool, skillGapTool, mcpToolset],
+    tools: [generateRoadmapTool, skillGapTool],
 });
 
 module.exports = {

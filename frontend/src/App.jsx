@@ -244,7 +244,8 @@ function App() {
             } else if (event.type === "progress") {
               setStreamingProgress(event.status);
             } else if (event.type === "text") {
-              accumulatedText += event.content;
+              const cleanedContent = (event.content || "").replace(/\{"result":""\}/g, "");
+              accumulatedText += cleanedContent;
               setStreamingText(accumulatedText);
               setStreamingProgress("");
             } else if (event.type === "done") {
@@ -263,8 +264,9 @@ function App() {
       const finalChats = updatedChats.map((chat) => {
         if (chat.id === chatId) {
           const newAgents = [...new Set([...(chat.agents || []), detectedAgent, ...allAgents])];
+          const finalText = accumulatedText.trim() || "I'm sorry, I couldn't generate a response.";
           return { ...chat, updatedAt: getTimestamp(), agents: newAgents, messages: [...chat.messages, {
-            type: "bot", text: accumulatedText, agent: detectedAgent,
+            type: "bot", text: finalText, agent: detectedAgent,
             agents: allAgents.length > 1 ? allAgents : undefined, timestamp: getTimestamp(),
           }] };
         }

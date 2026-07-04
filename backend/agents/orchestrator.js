@@ -39,11 +39,23 @@ const interviewTool = new AgentTool({
 
 const orchestratorAgent = new LlmAgent({
     name: "orchestrator_agent",
-    model: "gemini-2.5-flash",
-    description: "Root agent that routes user queries to specialist agents for " +
-        "resume analysis, career planning, and interview preparation.",
+    model: "gemini-3.1-flash-lite",
+    description: "...",
     instruction: orchestratorPrompt,
-    tools: [resumeTool, careerTool, interviewTool],
+
+    tools: [
+        resumeTool,
+        careerTool,
+        interviewTool
+    ],
+
+    generateContentConfig: {
+        toolConfig: {
+            functionCallingConfig: {
+                mode: "ANY"
+            }
+        }
+    }
 });
 
 module.exports = {

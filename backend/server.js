@@ -1,3 +1,4 @@
+console.log("SERVER VERSION: June 26");
 require("dotenv").config();
 const DEBUG = process.env.DEBUG === "true";
 
@@ -79,6 +80,19 @@ function getQuotaErrorMessage(error) {
  * Helper: Build structured error response, detecting quota errors specifically.
  */
 function buildErrorResponse(error, defaultAgent) {
+    console.log("========== FULL ERROR ==========");
+    console.dir(error, {
+        depth: null
+    });
+
+    console.log("Status:", error.status);
+    console.log("StatusCode:", error.statusCode);
+    console.log("Code:", error.code);
+    console.log("Message:", error.message);
+    console.log("ErrorDetails:", error.errorDetails);
+    console.log("Cause:", error.cause);
+
+    console.log("==============================");
     const quotaMsg = getQuotaErrorMessage(error);
 
     if (quotaMsg) {
@@ -157,6 +171,11 @@ async function runAgent(userId, sessionId, messageText) {
         sessionId,
         newMessage,
     })) {
+        if (event.errorCode) {
+            const err = new Error(event.errorMessage);
+            err.status = event.errorCode;
+            throw err;
+        }
         // Log every event to track routing
         if (event.author && event.author !== "user") {
             const partTypes = (event.content && event.content.parts) ?
@@ -211,16 +230,18 @@ async function runAgent(userId, sessionId, messageText) {
     let reply = null;
 
     // Priority 1: If there's a direct text event (orchestrator summarized the response)
-    if (lastTextEvent) {
-        reply = lastTextEvent.content.parts
-            .filter((part) => part.text && !part.thought)
-            .map((part) => part.text)
-            .join("\n");
+
+    // Priority 1: Always use the specialist agent response
+    if (functionResponseText) {
+        reply = functionResponseText;
     }
 
-    // Priority 2: If no text event but we got a functionResponse, use that
-    if (!reply && functionResponseText) {
-        reply = functionResponseText;
+    // Priority 2: Fall back to orchestrator text
+    else if (lastTextEvent) {
+        reply = lastTextEvent.content.parts
+            .filter(part => part.text && !part.thought)
+            .map(part => part.text)
+            .join("\n");
     }
 
     // Fallback
@@ -232,7 +253,10 @@ async function runAgent(userId, sessionId, messageText) {
     }
 
     // Use the routed agent name (from function call) or fallback to event author
-    const agent = routedAgent !== "orchestrator_agent" ? routedAgent : "orchestrator_agent";
+    const agent =
+        routedAgent && routedAgent !== "orchestrator_agent" ?
+        routedAgent :
+        "orchestrator_agent";
 
     if (DEBUG) console.log(`[RESULT] Final agent: ${agent}, reply length: ${reply.length}`);
 
@@ -419,7 +443,7 @@ function extractTargetRoles(text) {
 // ============================================================
 // POST /chat - Unified chat endpoint using multi-agent system
 // ============================================================
-app.post("/chat", async (req, res) => {
+app.post("/chat", async(req, res) => {
     try {
         const {
             message,
@@ -466,7 +490,7 @@ app.post("/chat", async (req, res) => {
 // ============================================================
 // POST /chat/stream - SSE streaming endpoint (supports multi-agent)
 // ============================================================
-app.post("/chat/stream", async (req, res) => {
+app.post("/chat/stream", async(req, res) => {
     const {
         message,
         sessionId: clientSessionId
@@ -491,7 +515,7 @@ app.post("/chat/stream", async (req, res) => {
 
     // Handle client disconnect
     let closed = false;
-    req.on("close", () => {
+    res.on("close", () => {
         closed = true;
     });
 
@@ -527,9 +551,36 @@ app.post("/chat/stream", async (req, res) => {
             newMessage
         })) {
             if (closed) break;
+            console.log("========== EVENT ==========");
+            console.dir(event, {
+                depth: null
+            });
+            console.log("EVENT TYPE:", Object.keys(event));
+            console.dir(event, { depth: null });
+            console.log("===========================");
+
+            // Handle ADK yielded errors (e.g. 429 quota limits)
+            if (event.errorCode) {
+                console.error("[ADK RUNNER ERROR]", event.errorCode, event.errorMessage);
+                const quotaMsg = getQuotaErrorMessage(new Error(event.errorMessage));
+                const errorPayload = {
+                    type: "error",
+                    errorType: quotaMsg ? "QUOTA_EXCEEDED" : "PROCESSING_FAILED",
+                    message: quotaMsg || `AI Service Error: ${event.errorMessage}`,
+                };
+                res.write(`data: ${JSON.stringify(errorPayload)}\n\n`);
+                res.end();
+                return;
+            }
+
             if (!event.content || !event.content.parts) continue;
 
             for (const part of event.content.parts) {
+                console.log("HAS TEXT:", !!part.text);
+
+                console.log("HAS FUNCTION RESPONSE:", !!part.functionResponse);
+                console.log("PART:");
+                console.dir(part, { depth: null });
                 if (closed) break;
 
                 // Track routing — detect when a new agent is called
@@ -551,11 +602,20 @@ app.post("/chat/stream", async (req, res) => {
                 if (part.functionResponse) {
                     const resp = part.functionResponse.response;
                     let text = null;
-                    if (typeof resp === "string") text = resp;
-                    else if (resp && resp.output) text = resp.output;
-                    else if (resp && resp.result) text = typeof resp.result === "string" ? resp.result : JSON.stringify(resp.result);
-                    else if (resp && resp.text) text = resp.text;
-                    else if (resp) text = JSON.stringify(resp);
+
+                    if (typeof resp === "string") {
+                        text = resp;
+                    } else if (resp && resp.result) {
+                        text = typeof resp.result === "string" ?
+                            resp.result :
+                            JSON.stringify(resp.result);
+                    } else if (resp && resp.output) {
+                        text = resp.output;
+                    } else if (resp && resp.text) {
+                        text = resp.text;
+                    } else if (resp) {
+                        text = JSON.stringify(resp);
+                    }
 
                     if (text) {
                         fullText += text;
@@ -568,7 +628,12 @@ app.post("/chat/stream", async (req, res) => {
                 }
 
                 // Direct text from orchestrator
-                if (part.text && !part.thought) {
+                if (
+                    part.text &&
+                    !part.thought &&
+                    !part.functionResponse &&
+                    currentAgent === "orchestrator_agent"
+                ) {
                     fullText += part.text;
                     const chunks = part.text.match(/.{1,80}/gs) || [part.text];
                     for (const chunk of chunks) {
@@ -623,7 +688,7 @@ function getAgentProgressLabel(agentName) {
 // ============================================================
 // POST /upload-resume - Resume upload, parsed then sent to agents
 // ============================================================
-app.post("/upload-resume", upload.single("resume"), async (req, res) => {
+app.post("/upload-resume", upload.single("resume"), async(req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({
@@ -673,7 +738,7 @@ app.post("/upload-resume", upload.single("resume"), async (req, res) => {
 // ============================================================
 // POST /analyze-resume - Legacy endpoint (preserved for backward compat)
 // ============================================================
-app.post("/analyze-resume", upload.single("resume"), async (req, res) => {
+app.post("/analyze-resume", upload.single("resume"), async(req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({
@@ -722,7 +787,7 @@ app.post("/analyze-resume", upload.single("resume"), async (req, res) => {
 // ============================================================
 // POST /career-plan - Legacy endpoint (preserved for backward compat)
 // ============================================================
-app.post("/career-plan", async (req, res) => {
+app.post("/career-plan", async(req, res) => {
     try {
         const {
             resumeText,
@@ -803,7 +868,7 @@ function buildContextBlock(state) {
 // ============================================================
 // POST /ats-analyze - ATS Resume vs Job Description analysis
 // ============================================================
-app.post("/ats-analyze", upload.single("resume"), async (req, res) => {
+app.post("/ats-analyze", upload.single("resume"), async(req, res) => {
     try {
         const {
             jobDescription,
