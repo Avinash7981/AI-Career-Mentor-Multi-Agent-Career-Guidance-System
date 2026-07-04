@@ -1,18 +1,3 @@
-
-## Architecture Overview
-
-The system follows a multi-agent architecture built using Google ADK.
-
-- The React frontend provides an intuitive chat interface.
-- Express.js acts as the backend API server.
-- The Google ADK Orchestrator Agent analyzes every user request and routes it to the appropriate specialist.
-- Resume Agent performs resume reviews and ATS optimization.
-- Career Agent generates personalized career roadmaps, GitHub analysis, and skill-gap recommendations.
-- Interview Agent conducts mock interviews and interview preparation.
-- GitHub MCP Server enables external GitHub repository analysis.
-- MongoDB stores user accounts, conversations, and analytics.
-- Gemini API powers reasoning and natural language generation across all agents.
-
 # 🚀 AI Career Mentor – Multi-Agent Career Guidance System
 
 > An intelligent, AI-powered career assistant built using Google's Agent Development Kit (ADK), Gemini API, React, Express.js, MongoDB, and Firebase Authentication.
@@ -195,6 +180,19 @@ C --> B
 ```
 
 ---
+## Architecture Overview
+
+The system follows a multi-agent architecture built using Google ADK.
+
+- The React frontend provides an intuitive chat interface.
+- Express.js acts as the backend API server.
+- The Google ADK Orchestrator Agent analyzes every user request and routes it to the appropriate specialist.
+- Resume Agent performs resume reviews and ATS optimization.
+- Career Agent generates personalized career roadmaps, GitHub analysis, and skill-gap recommendations.
+- Interview Agent conducts mock interviews and interview preparation.
+- GitHub MCP Server enables external GitHub repository analysis.
+- MongoDB stores user accounts, conversations, and analytics.
+- Gemini API powers reasoning and natural language generation across all agents.
 
 # 🧠 AI Agents
 
