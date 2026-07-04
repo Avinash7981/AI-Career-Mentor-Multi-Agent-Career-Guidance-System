@@ -1,32 +1,4 @@
-## 🏗️ System Architecture
 
-```mermaid
-flowchart TD
-
-A[👤 User] --> B[React Frontend]
-
-B --> C[Express.js Backend API]
-
-C --> D[Google ADK Orchestrator Agent]
-
-D --> E[📄 Resume Agent]
-D --> F[💼 Career Agent]
-D --> G[🎤 Interview Agent]
-
-E --> H[Gemini API]
-F --> H
-G --> H
-
-F --> I[GitHub MCP Server]
-
-C --> J[(MongoDB)]
-
-J --> C
-H --> C
-I --> C
-
-C --> B
-```
 ## Architecture Overview
 
 The system follows a multi-agent architecture built using Google ADK.
@@ -192,30 +164,34 @@ Benefits include:
 
 ---
 
-# 🏗️ System Architecture
+## 🏗️ System Architecture
 
-```
-                User
-                  │
-                  ▼
-        React Frontend
-                  │
-                  ▼
-      Express Backend API
-                  │
-                  ▼
-      ADK Orchestrator Agent
-       ┌────────┼────────┐
-       ▼        ▼        ▼
- Resume   Interview   Career
-  Agent      Agent      Agent
-       \        |        /
-        \       |       /
-          Gemini API
-              │
-     MongoDB + Firebase
-              │
-         GitHub MCP
+```mermaid
+flowchart TD
+
+A[👤 User] --> B[React Frontend]
+
+B --> C[Express.js Backend API]
+
+C --> D[Google ADK Orchestrator Agent]
+
+D --> E[📄 Resume Agent]
+D --> F[💼 Career Agent]
+D --> G[🎤 Interview Agent]
+
+E --> H[Gemini API]
+F --> H
+G --> H
+
+F --> I[GitHub MCP Server]
+
+C --> J[(MongoDB)]
+
+J --> C
+H --> C
+I --> C
+
+C --> B
 ```
 
 ---
