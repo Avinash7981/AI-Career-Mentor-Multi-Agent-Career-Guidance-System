@@ -62,6 +62,9 @@ Analyze resumes for:
 - Action Verbs
 - Resume Score
 - Suggestions for Improvement
+- <p align="center">
+  <img src="assets/images/resume-expert.png" width="900" alt="Resume Expert">
+</p>
 
 ---
 
@@ -77,7 +80,9 @@ Supports:
 - Follow-up Questions
 - STAR Method Evaluation
 - Constructive Feedback
-
+- <p align="center">
+  <img src="assets/images/interview-agent.png" width="900" alt="Resume Expert">
+</p>
 ---
 
 ## 💼 Career Mentor
@@ -89,6 +94,9 @@ Provides personalized career guidance based on:
 - Resume
 - GitHub Profile
 - Career Goals
+- <p align="center">
+  <img src="assets/images/career-agent.png" width="900" alt="Resume Expert">
+</p>
 
 Generates:
 
@@ -108,6 +116,22 @@ Analyzes:
 - Project Structure
 - Technologies Used
 - Contribution History
+- <p align="center">
+  <img src="assets/images/github-analysis.png" width="900" alt="Resume Expert">
+</p>
+- <p align="center">
+  <img src="assets/images/github-analysis1.png" width="900" alt="Resume Expert">
+</p>
+- <p align="center">
+  <img src="assets/images/github-analysis2.png" width="900" alt="Resume Expert">
+</p>
+- <p align="center">
+  <img src="assets/images/github-analysis3.png" width="900" alt="Resume Expert">
+</p>
+- <p align="center">
+  <img src="assets/images/github-analysis4.png" width="900" alt="Resume Expert">
+</p>
+
 
 Provides improvement suggestions for recruiters.
 
@@ -387,19 +411,6 @@ http://localhost:5173
 ```
 
 ---
-
-# 📸 Screenshots
-
-Add screenshots of:
-
-- Dashboard
-- Resume Review
-- Interview Coach
-- Career Roadmap
-- GitHub Analysis
-
----
-
 # 🔮 Future Improvements
 
 - Voice-based interviews
