@@ -205,7 +205,7 @@ function App() {
     abortControllerRef.current = controller;
 
     try {
-      const response = await fetch("http://localhost:3001/chat/stream", {
+      const response = await fetch("https://ai-career-mentor-multi-agent-career.onrender.com/chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: messageText, sessionId }),
@@ -421,7 +421,7 @@ Please provide a structured roadmap with these EXACT sections:
       formData.append("sessionId", sessionId);
       if (resumeFile) formData.append("resume", resumeFile);
 
-      const response = await axios.post("http://localhost:3001/ats-analyze", formData);
+      const response = await axios.post("https://ai-career-mentor-multi-agent-career.onrender.com/ats-analyze", formData);
       const analysis = response.data.analysis;
       const agent = response.data.agent || "resume_agent";
 
@@ -466,7 +466,7 @@ Please provide a structured roadmap with these EXACT sections:
       const formData = new FormData();
       formData.append("resume", file);
       formData.append("sessionId", sessionId);
-      const response = await axios.post("http://localhost:3001/upload-resume", formData);
+      const response = await axios.post("https://ai-career-mentor-multi-agent-career.onrender.com/upload-resume", formData);
       const analysis = response.data.analysis;
       const agent = response.data.agent || "resume_agent";
       const finalChats = updatedChats.map((chat) => {
