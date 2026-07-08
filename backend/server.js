@@ -28,6 +28,15 @@ const upload = multer({
 app.use(cors());
 app.use(express.json());
 
+// Root Route
+app.get("/", (req, res) => {
+    res.json({
+        status: "success",
+        message: "AI Career Mentor Backend is Running 🚀",
+        version: "June 26"
+    });
+});
+
 // ADK Runner setup
 const sessionService = new InMemorySessionService();
 const runner = new Runner({
